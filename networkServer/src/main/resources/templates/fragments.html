@@ -186,6 +186,31 @@
 
 </div>
 
+<div th:fragment="users">
+
+    <div>
+
+        <h1> Users</h1>
+        <div class="sub-nav" style="margin-top: 20px;">
+            <button th:if="${hasAdminRole}" type="button" class="btn btn-default" ng-click="usersCtrl.create()">
+                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> User
+            </button>
+
+            <div class="form-inline">
+                <div class="form-group">
+                    <input class="form-control" type="text" ng-model="usersCtrl.searchInput" placeholder="Name"> </input>
+                    <button class="btn btn-default" ng-click="usersCtrl.find()">
+                        <i class="glyphicon glyphicon-search"></i> Search
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
 <div th:fragment="upload-status">
     <div th:if="${error} == true">
         <div>The following error occurred:</div>

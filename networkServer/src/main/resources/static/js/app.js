@@ -22,9 +22,11 @@
         .service('toasterService', toasterService)
         .service('fileUpload', fileUpload)
         .service('settingsService', settingsService)
+        .service('userService', userService)
         .controller("NavController", NavController)
         .controller("TransactionController", TransactionController)
         .controller("UploadController", UploadController)
+        .controller("UsersController", UsersController)
         .config(config)
         .run(['transactionService', function(transactionService) {
             transactionService.initialize();
@@ -43,6 +45,12 @@
                 templateUrl: "upload",
                 controller: "UploadController",
                 controllerAs: "uploadCtrl"
+            })
+            .when("/users", {
+                templateUrl: "users",
+                controller: "UsersController",
+                controllerAs: "usersCtrl"
+
             })
             .when("/home", {
                 templateUrl: "about"
@@ -296,6 +304,148 @@
     }
 
 
+    UsersController.$inject = ['$window', 'userService', 'users', 'toasterService'];
+    function UsersController($window, userService, users, toasterService) {
+        var self = this;
+        self.users = users;
+        self.roles = $window.roles;
+        self.isNewAccount = isNewAccount;
+        self.getUsers = userService.getUsers;
+        self.create = create;
+        self.find = find;
+        self.delete = deleteUser;
+        self.hasRole = userService.hasRole;
+        self.save = save;
+        self.edit = edit;
+        self.showForm = showForm;
+        self.updateRole = updateRole;
+        self.removeFromModel = removeFromModel;
+        //self.org = organizationService.getActiveOrg();
+        self.isRoleDisabled = isRoleDisabled;
+
+        function isRoleDisabled(role) {
+
+            if (userService.hasRoleByName(userService.activeUser, 'ROLE_ADMIN')) {
+                return false;
+            }
+            else {
+                //Disable roles for anything but "ROLE_ORG_ADMIN"
+                if (role.id != 2) {
+                    return true;
+                }
+            }
+        }
+
+        function create() {
+
+            var user = {
+                name: '',
+                address: '',
+                title: '',
+                phone: '',
+                email: '',
+                roles: [],
+                username: '',
+                password: '',
+                editing: true
+            };
+            self.users.push(user);
+
+        };
+
+
+        self.searchInput = '';
+
+        function find() {
+            userService.getByName(self.searchInput, 1).then(function (data) {
+                self.users = data;
+            });
+        };
+
+        function removeFromModel(user) {
+            var index = self.users.indexOf(user);
+            if (index > -1) {
+                self.users.splice(index, 1);
+            }
+        };
+
+
+        function deleteUser(user) {
+
+            //If it's an existing user we need to delete it on the server
+            if (user.hasOwnProperty('id')) {
+
+                userService.deleteUser(user).then(function (data) {
+                    self.removeFromModel(user);
+                });
+
+            }
+            else {
+                //it's a new user that hasn't been persisted.
+                self.removeFromModel(user);
+
+            }
+        };
+
+        function isNewAccount(user) {
+            return !user.hasOwnProperty('id');
+        }
+
+        function save(user) {
+
+            delete user.editing;
+
+            if (user.hasOwnProperty('id')) {
+                //update
+
+                userService.updateUser(user).then(function (data) {
+                    toasterService.info("Successfully updated user.");
+                },function(data) {
+                    user.editing = true;
+                    toasterService.ajaxInfo(data);
+                });
+
+            }
+            else {
+                //create
+                userService.createUser(user).then(function (data) {
+                    toasterService.info("Successfully created user with id " + data.id);
+                }).catch(function (e) {
+                    self.edit(user);
+                });
+
+
+            }
+        };
+
+        function edit(user) {
+            user['editing'] = true;
+        };
+
+
+        function showForm(user) {
+            return user.hasOwnProperty('editing') && user.editing === true;
+        };
+
+
+        function updateRole($event, role, user) {
+
+            var checkbox = $event.target;
+
+            if (checkbox.checked === true) {
+                user.roles.push(role);
+            } else {
+                // remove item
+                for (var i = 0; i < user.roles.length; i++) {
+                    if (user.roles[i].id == role.id) {
+                        user.roles.splice(i, 1);
+                    }
+                }
+            }
+        };
+
+
+    }
 
     NavController.$inject = ['$location'];
 
@@ -461,7 +611,180 @@
 
     }
 
+    /* User Service */
 
+    userService.$inject = ['$window', '$http', '$q', '$cacheFactory', '$filter', 'toasterService'];
+
+    function userService($window, $http, $q, $cacheFactory, $filter, toasterService) {
+
+
+        var service = {
+            getUsers: getUsers,
+            getById: getById,
+            getByName: getByName,
+            deleteUser: deleteUser,
+            updateUser: updateUser,
+            createUser: createUser,
+            changePassword: changePassword,
+            find: find,
+            hasRole: hasRole,
+            hasRoleByName: hasRoleByName,
+            activeUser: $window.activeUser
+        };
+
+        return service;
+
+        function deleteUser(user) {
+            var deferred = $q.defer();
+
+            $http.delete('/api/v1/users/' + user.id).success(function (data) {
+
+                deferred.resolve(user);
+            }).error(function (data) {
+                toasterService.ajaxInfo(data);
+                deferred.reject("An error occured while deleting a user.");
+            });
+
+            return deferred.promise;
+        }
+
+        function hasRole(user, role) {
+
+            var found = false;
+
+            for (var i = 0; i < user.roles.length; i++) {
+                if (user.roles[i].id == role.id) {
+                    found = true;
+                    break;
+                }
+            }
+            return found;
+        }
+
+        function hasRoleByName(user, roleName) {
+            if (user == null) {
+                return false;
+            }
+            var found = false;
+
+            for (var i = 0; i < user.roles.length; i++) {
+                if (user.roles[i].name === roleName) {
+                    found = true;
+                    break;
+                }
+            }
+            return found;
+        }
+
+        function updateUser(user) {
+
+            var deferred = $q.defer();
+
+            $http.put('/api/v1/users/' + user.id, user).success(function (data) {
+                deferred.resolve(user);
+            }).error(function (data) {
+                toasterService.ajaxInfo(data);
+                deferred.reject("An error occured while updating a user.");
+            });
+
+            return deferred.promise;
+        }
+
+
+        function changePassword(user, password) {
+
+            var deferred = $q.defer();
+
+            $http.put('/api/v1/users/' + user.id + '/password', password).then(function (response) {
+                deferred.resolve(response);
+            }, function (response) {
+                deferred.resolve(response);
+            });
+
+            return deferred.promise;
+        }
+
+
+        function createUser(user) {
+
+            var deferred = $q.defer();
+
+            $http.post('/api/v1/users/', user).success(function (data) {
+                angular.extend(user, data);
+                deferred.resolve(user);
+            }).error(function (data) {
+                toasterService.ajaxInfo(data);
+                deferred.reject("An error occured while updating a user.");
+            });
+
+            return deferred.promise;
+        }
+
+
+        function getUsers(orgID) {
+
+            var deferred = $q.defer();
+
+            $http.get('/api/v1/users', {
+                'params': {'organizationId': orgID},
+                cache: false
+            }).success(function (data) {
+                deferred.resolve(data);
+            }).error(function (data) {
+                toasterService.ajaxInfo(data);
+                deferred.reject("An error occured while fetching users.");
+            });
+
+            return deferred.promise;
+        };
+
+        function getById(id) {
+            var user = $filter('getByProperty')('id', id, users);
+
+            if (user == null) {
+                user = find(id);
+            }
+
+            return user;
+        };
+
+        function find(id) {
+
+            var deferred = $q.defer();
+
+            $http.get('/api/v1/users/' + id, {
+                cache: false
+            }).success(function (data) {
+                deferred.resolve(data);
+            }).error(function (data) {
+                toasterService.ajaxInfo(data);
+                deferred.reject("An error occured while fetching the user.");
+            });
+
+            return deferred.promise;
+        }
+
+        function getByName(name, orgID) {
+
+            var deferred = $q.defer();
+
+            $http.get('/api/v1/users', {
+                'params': {
+                    'organizationId': orgID,
+                    'name': name
+                },
+                cache: false
+            }).success(function (data) {
+                deferred.resolve(data);
+            }).error(function (data) {
+                toasterService.ajaxInfo(data);
+                deferred.reject("An error occured while fetching the user.");
+            });
+
+            return deferred.promise;
+        }
+
+    }
 
     transactionService.$inject = [ '$http', '$q', '$cacheFactory', 'toasterService'];
 
@@ -573,6 +896,9 @@
 
             switch (input) {
                 case 'ROLE_SYSTEM_ADMIN':
+                    friendlyName = "System Administrator";
+                    break;
+                case 'ROLE_ADMIN':
                     friendlyName = "System Administrator";
                     break;
                 case 'ROLE_ORG_ADMIN':

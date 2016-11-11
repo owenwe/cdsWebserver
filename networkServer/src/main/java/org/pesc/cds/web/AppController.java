@@ -43,7 +43,7 @@ public class AppController {
     private OrganizationService organizationService;
 
 
-    private boolean hasRole(Collection<GrantedAuthority> authorities, String role) {
+    public static boolean hasRole(Collection<GrantedAuthority> authorities, String role) {
         boolean hasRole = false;
         for (GrantedAuthority authority : authorities) {
             hasRole = authority.getAuthority().equals(role);
@@ -71,8 +71,8 @@ public class AppController {
             Collection<GrantedAuthority> authorities = auth.getAuthorities();
             isAuthenticated = true;
 
-            //model.addAttribute("hasSupportRole", hasRole(authorities, "ROLE_SUPPORT"));
-            //model.addAttribute("hasAdminRole", hasRole(authorities, "ROLE_ADMIN"));
+            model.addAttribute("hasSupportRole", hasRole(authorities, "ROLE_SUPPORT"));
+            model.addAttribute("hasAdminRole", hasRole(authorities, "ROLE_ADMIN"));
 
             // model.addAttribute("roles", roleRepo.findAll() );
         }
@@ -174,6 +174,14 @@ public class AppController {
         return "fragments :: transactions";
     }
 
+
+    @RequestMapping("/users")
+    public String getUsersPage(Model model) {
+
+        buildCommonModel(model);
+
+        return "fragments :: users";
+    }
 
     @RequestMapping("/upload")
     public String getTransfersPage(Model model) {
