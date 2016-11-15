@@ -177,7 +177,7 @@ public class UserService {
      * @return
      */
     public Credentials unsecuredCreate(Credentials user) {
-        validatePassword(user.getPassword());
+        //validatePassword(user.getPassword());
 
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);

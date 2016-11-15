@@ -50,8 +50,7 @@ public class UserController {
     @RequestMapping(value="/getUserByName", method= RequestMethod.GET)
     @Produces(MediaType.APPLICATION_JSON)
     @ResponseBody
-    public List<Credentials> getUserByName(@RequestParam(value="name", required = false) String name,
-                                           @RequestParam(value="organizationId", required = false) Integer organizationId) {
+    public List<Credentials> getUserByName(@RequestParam(value="name", required = false) String name) {
         return userService.findByName(name);
     }
 

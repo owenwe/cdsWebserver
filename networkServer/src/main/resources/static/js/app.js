@@ -373,7 +373,7 @@
         self.searchInput = '';
 
         function find() {
-            userService.getByName(self.searchInput, 1).then(function (data) {
+            userService.getByName(self.searchInput).then(function (data) {
                 self.users = data;
             });
         };
@@ -803,11 +803,7 @@
         function updateUser(user) {
 
             var deferred = $q.defer();
-
-            $http.put('/api/v1/users/saveUser/',{
-                 'params': {'user': user},
-                  cache: false
-            }).success(function (data) {
+            $http.put('/api/v1/users/saveUser/',user).success(function (data) {
                 deferred.resolve(user);
             }).error(function (data) {
                 toasterService.ajaxInfo(data);
@@ -836,10 +832,7 @@
 
             var deferred = $q.defer();
 
-            $http.post('/api/v1/users/createUser/', {
-                'params': {'user': user},
-                 cache: false
-            }).success(function (data) {
+            $http.post('/api/v1/users/createUser/', user).success(function (data) {
                 angular.extend(user, data);
                 deferred.resolve(user);
             }).error(function (data) {
@@ -894,13 +887,12 @@
             return deferred.promise;
         }
 
-        function getByName(name, orgID) {
+        function getByName(name) {
 
             var deferred = $q.defer();
 
             $http.get('/api/v1/users/getUserByName/', {
                 'params': {
-                    'organizationId': orgID,
                     'name': name
                 },
                 cache: false

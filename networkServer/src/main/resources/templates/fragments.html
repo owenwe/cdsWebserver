@@ -256,7 +256,6 @@
                            <span  class="checkbox-inline"> <input
                                    type="checkbox"
                                    ng-checked="usersCtrl.hasRole(user, role)"
-                                   ng-disabled="usersCtrl.isRoleDisabled(role)"
                                    name="roles"
                                    ng-click="usersCtrl.updateRole($event, role, user)"> {{role.name | friendlyRoleName}} </span>
                         </span>
