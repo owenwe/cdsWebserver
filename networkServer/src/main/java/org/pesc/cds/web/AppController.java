@@ -6,6 +6,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.json.JSONObject;
 import org.pesc.cds.domain.Transaction;
+import org.pesc.cds.model.Credentials;
 import org.pesc.cds.repository.TransactionService;
 import org.pesc.cds.service.OrganizationService;
 import org.pesc.cds.service.UserService;
@@ -28,6 +29,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.List;
 
 @Controller
 public class AppController {
@@ -90,12 +92,21 @@ public class AppController {
         model.addAttribute("roles", userService.getRoles() );
 
 
-        if (isAuthenticated) {
+        /*if (isAuthenticated) {
             org.pesc.cds.model.User activeUser = new org.pesc.cds.model.User();
             activeUser.setName("Admin");
 
             model.addAttribute("activeUser", activeUser);
+        }*/
+        if(isAuthenticated) {
+            User auth = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            List<Credentials> netwkUser = userService.findByUsername(auth.getUsername());
+
+            if (netwkUser.size() == 1) {
+                model.addAttribute("activeUser", netwkUser.get(0));
+            }
         }
+
         return isAuthenticated;
 
     }

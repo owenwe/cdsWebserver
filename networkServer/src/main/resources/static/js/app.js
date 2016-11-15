@@ -875,7 +875,10 @@
 
             var deferred = $q.defer();
 
-            $http.get('/api/v1/users/getUserById' + id, {
+            $http.get('/api/v1/users/getUserById/', {
+                'params': {
+                    'id': id
+                 },
                 cache: false
             }).success(function (data) {
                 deferred.resolve(data);
