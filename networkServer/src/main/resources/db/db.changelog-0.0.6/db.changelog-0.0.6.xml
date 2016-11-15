@@ -34,4 +34,13 @@
 		<sqlFile encoding="utf8" path="4-default-userRoles.sql" relativeToChangelogFile="true" />
 	</changeSet>
 
+	<changeSet id="8" author="prabhu" context="dev, ci, qa, prod">
+		<comment>
+			This change set delete roles..
+		</comment>
+		<sqlFile encoding="utf8" path="5-delete_roles.sql" relativeToChangelogFile="true" />
+	</changeSet>
+
+
+
 </databaseChangeLog>

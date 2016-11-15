@@ -27,6 +27,7 @@
         .controller("TransactionController", TransactionController)
         .controller("UploadController", UploadController)
         .controller("UsersController", UsersController)
+        .controller("UserController", UserController)
         .config(config)
         .run(['transactionService', function(transactionService) {
             transactionService.initialize();
@@ -46,10 +47,25 @@
                 controller: "UploadController",
                 controllerAs: "uploadCtrl"
             })
+            .when("/user/:user_id", {
+                templateUrl: "user-details",
+                controller: "UserController",
+                controllerAs: "userCtrl",
+                resolve: {
+                    users: ['$route', 'userService', function ($route, userService) {
+                        return userService.find($route.current.params.user_id);
+                    }]
+                }
+            })
             .when("/users", {
                 templateUrl: "users",
                 controller: "UsersController",
-                controllerAs: "usersCtrl"
+                controllerAs: "usersCtrl",
+                resolve: {
+                    users: ['$window', 'userService', function ($window, userService) {
+                        return userService.getUsers();
+                    }]
+                }
 
             })
             .when("/home", {
@@ -325,7 +341,7 @@
 
         function isRoleDisabled(role) {
 
-            if (userService.hasRoleByName(userService.activeUser, 'ROLE_ADMIN')) {
+            if (userService.hasRoleByName(userService.activeUser, 'ADMIN')) {
                 return false;
             }
             else {
@@ -444,6 +460,114 @@
             }
         };
 
+
+    }
+
+    UserController.$inject = ['$window', 'toasterService', 'userService', 'users'];
+    function UserController($window, toasterService, userService, users) {
+
+        if (users.length != 1) {
+            toasterService.error("An error occurred while processing a user record: only one record should be provided.");
+        }
+        var self = this;
+        self.user = users[0];
+        self.edit = edit;
+        self.showForm = showForm;
+        self.save = save;
+        self.isNewAccount = isNewAccount;
+        self.roles = $window.roles;
+        self.updateRole = updateRole;
+        self.hasRole = hasRole;
+        self.newPassword = '';
+        self.confirmPassword = '';
+        self.showPasswordForm = false;
+        self.updatePassword = updatePassword;
+        self.isRoleDisabled = isRoleDisabled;
+
+        function isRoleDisabled(role) {
+
+            if (userService.hasRoleByName(userService.activeUser, 'ADMIN')) {
+                return false;
+            }
+            else {
+                //Disable roles for anything but "ROLE_ORG_ADMIN"
+                if (role.id != 2) {
+                    return true;
+                }
+            }
+        }
+
+        function edit() {
+            self.user['editing'] = true;
+        }
+
+        function showForm() {
+            return self.user.hasOwnProperty('editing') && self.user.editing === true;
+        }
+
+        function save() {
+            delete self.user.editing;
+
+            userService.updateUser(self.user).then(function (data) {
+                toasterService.info("Successfully updated user.");
+            }, function(data) {
+                self.user.editing = true;
+                toasterService.ajaxInfo(data);
+            });
+        }
+
+        function isNewAccount() {
+            return !self.user.hasOwnProperty('id');
+        }
+
+        function hasRole(role) {
+            var found = false;
+
+            for (var i = 0; i < self.user.roles.length; i++) {
+                if (self.user.roles[i].id == role.id) {
+                    found = true;
+                    break;
+                }
+            }
+            return found;
+        }
+
+
+        function updateRole($event, role) {
+
+            var checkbox = $event.target;
+
+            if (checkbox.checked === true) {
+                self.user.roles.push(role);
+            } else {
+                // remove item
+                for (var i = 0; i < self.user.roles.length; i++) {
+                    if (self.user.roles[i].id == role.id) {
+                        self.user.roles.splice(i, 1);
+                    }
+                }
+            }
+        };
+
+        function updatePassword() {
+            if (isValidPassword(self.newPassword) == false) {
+                toasterService.error(PASSWORD_REQUIREMENTS);
+            }
+            else if (self.newPassword !== self.confirmPassword) {
+               toasterService.error("The passwords don't match. Please reenter your password.");
+            }
+            else {
+                userService.changePassword(self.user, self.newPassword).then(function(response){
+                    if (response.status == 200) {
+                        toasterService.info("Successfully changed password.");
+                    }
+                    else {
+                        toasterService.ajaxInfo(response.data);
+                    }
+                    self.showPasswordForm = false;
+                })
+            }
+        };
 
     }
 
@@ -662,7 +786,7 @@
         }
 
         function hasRoleByName(user, roleName) {
-            if (user == null) {
+            if (user == null || user.roles == null) {
                 return false;
             }
             var found = false;
@@ -680,7 +804,10 @@
 
             var deferred = $q.defer();
 
-            $http.put('/api/v1/users/' + user.id, user).success(function (data) {
+            $http.put('/api/v1/users/saveUser/',{
+                 'params': {'user': user},
+                  cache: false
+            }).success(function (data) {
                 deferred.resolve(user);
             }).error(function (data) {
                 toasterService.ajaxInfo(data);
@@ -709,7 +836,10 @@
 
             var deferred = $q.defer();
 
-            $http.post('/api/v1/users/', user).success(function (data) {
+            $http.post('/api/v1/users/createUser/', {
+                'params': {'user': user},
+                 cache: false
+            }).success(function (data) {
                 angular.extend(user, data);
                 deferred.resolve(user);
             }).error(function (data) {
@@ -752,7 +882,7 @@
 
             var deferred = $q.defer();
 
-            $http.get('/api/v1/users/' + id, {
+            $http.get('/api/v1/users/getUserById' + id, {
                 cache: false
             }).success(function (data) {
                 deferred.resolve(data);
@@ -768,7 +898,7 @@
 
             var deferred = $q.defer();
 
-            $http.get('/api/v1/users', {
+            $http.get('/api/v1/users/getUserByName/', {
                 'params': {
                     'organizationId': orgID,
                     'name': name
@@ -898,7 +1028,7 @@
                 case 'ROLE_SYSTEM_ADMIN':
                     friendlyName = "System Administrator";
                     break;
-                case 'ROLE_ADMIN':
+                case 'ADMIN':
                     friendlyName = "System Administrator";
                     break;
                 case 'ROLE_ORG_ADMIN':

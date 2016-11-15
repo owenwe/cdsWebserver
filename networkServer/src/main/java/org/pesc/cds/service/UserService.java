@@ -117,7 +117,7 @@ public class UserService {
     }
 
     @Transactional(readOnly=false,propagation = Propagation.REQUIRED)
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public void delete(Integer id)  {
         this.userRepository.delete(id);
     }
@@ -135,7 +135,7 @@ public class UserService {
 
 
     @Transactional(readOnly=true,propagation = Propagation.REQUIRED)
-    @PostAuthorize("( (returnObject.organizationId == principal.organizationId OR principal.id == returnObject.id) OR hasRole('ROLE_ORG_ADMIN'))")
+    //@PostAuthorize("( (returnObject.organizationId == principal.organizationId OR principal.id == returnObject.id) OR hasRole('ROLE_ORG_ADMIN'))")
     public Credentials findById(Integer id)  {
         return this.userRepository.findOne(id);
     }
@@ -151,7 +151,7 @@ public class UserService {
         AuthUser auth = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
 
-        if (!AppController.hasRole(auth.getAuthorities(), "ROLE_ADMIN")) {
+        if (!AppController.hasRole(auth.getAuthorities(), "ADMIN")) {
             if (user.getRoles().contains(systemAdminRole)) {
                 throw new IllegalArgumentException("You do not have the authority to create a system administrator.") ;
             }
@@ -163,7 +163,8 @@ public class UserService {
     }
 
     @Transactional(readOnly=false,propagation = Propagation.REQUIRED)
-    @PreAuthorize("(#user.organizationId == principal.organizationId AND  hasRole('ROLE_ORG_ADMIN') ) OR hasRole('ROLE_ADMIN')")
+    //@PreAuthorize("(#user.organizationId == principal.organizationId AND  hasRole('ROLE_ORG_ADMIN') ) OR hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public Credentials create(Credentials user)  {
         checkPermissionsForRoleAssignment(user);
         validateRoles(user);
@@ -199,7 +200,8 @@ public class UserService {
     }
 
     @Transactional(readOnly=false,propagation = Propagation.REQUIRED)
-    @PreAuthorize("(#user.organizationId == principal.organizationId AND  hasRole('ROLE_ORG_ADMIN') ) OR hasRole('ROLE_ADMIN')")
+    //@PreAuthorize("(#user.organizationId == principal.organizationId AND  hasRole('ROLE_ORG_ADMIN') ) OR hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public Credentials update(Credentials user)  {
         checkPermissionsForRoleAssignment(user);
         validateRoles(user);

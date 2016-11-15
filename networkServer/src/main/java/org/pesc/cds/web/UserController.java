@@ -47,11 +47,18 @@ public class UserController {
 
     }
 
-    public List<Credentials> findUser(
-            @RequestParam("id") Integer id
-    ) {
+    @RequestMapping(value="/getUserByName", method= RequestMethod.GET)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ResponseBody
+    public List<Credentials> getUserByName(@RequestParam(value="name", required = false) String name,
+                                           @RequestParam(value="organizationId", required = false) Integer organizationId) {
+        return userService.findByName(name);
+    }
 
-        checkOrganizationParameter(id);
+    @RequestMapping(value="/getUserById", method= RequestMethod.GET)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ResponseBody
+    public List<Credentials> getUserById(@RequestParam(value="id", required = false) Integer id) {
 
         ArrayList<Credentials> results = new ArrayList<Credentials>();
 
@@ -62,6 +69,24 @@ public class UserController {
         }
 
         return results;
+
+    }
+
+    @RequestMapping(value="/saveUser", method= RequestMethod.PUT)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ResponseBody
+    public Credentials saveUser(@RequestBody Credentials user) {
+        userService.update(user);
+
+        return user;
+    }
+
+    @RequestMapping(value="/createUser", method= RequestMethod.POST)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ResponseBody
+    public Credentials createUser(@RequestBody Credentials user) {
+
+        return userService.create(user);
     }
 
     /*@GET
