@@ -477,6 +477,8 @@
         self.isNewAccount = isNewAccount;
         self.roles = $window.roles;
         self.updateRole = updateRole;
+        self.deleteUser = deleteUser;
+        self.removeFromModel = removeFromModel;
         self.hasRole = hasRole;
         self.newPassword = '';
         self.confirmPassword = '';
@@ -515,6 +517,21 @@
                 toasterService.ajaxInfo(data);
             });
         }
+
+        function deleteUser() {
+            userService.deleteUser(self.user).then(function (data) {
+            toasterService.info("User deleted Successfully.");
+            self.removeFromModel(self.user);
+            });
+        }
+
+        function removeFromModel(user) {
+            var index = self.users.indexOf(user);
+            if (index > -1) {
+                self.users.splice(index, 1);
+            }
+        };
+
 
         function isNewAccount() {
             return !self.user.hasOwnProperty('id');
@@ -558,12 +575,7 @@
             }
             else {
                 userService.changePassword(self.user, self.newPassword).then(function(response){
-                    if (response.status == 200) {
-                        toasterService.info("Successfully changed password.");
-                    }
-                    else {
-                        toasterService.ajaxInfo(response.data);
-                    }
+                    toasterService.info("Successfully changed password.");
                     self.showPasswordForm = false;
                 })
             }
@@ -588,10 +600,15 @@
             success: success,
             error: error,
             ajaxInfo: ajaxInfo,
+            info: info,
             renderHtml: renderHtml
         } ;
 
         return service;
+
+        function info(text) {
+            toaster.pop('warning', "Info", text);
+        }
 
         function success(text) {
             toaster.pop('success', "Success", text);
@@ -761,8 +778,13 @@
         function deleteUser(user) {
             var deferred = $q.defer();
 
-            $http.delete('/api/v1/users/' + user.id).success(function (data) {
-
+            $http.delete('/api/v1/users/removeUser/', {
+              'params': {
+                  'id': user.id
+               },
+              cache: false
+            }).success(function (data) {
+                angular.extend(user, data);
                 deferred.resolve(user);
             }).error(function (data) {
                 toasterService.ajaxInfo(data);
@@ -817,11 +839,12 @@
         function changePassword(user, password) {
 
             var deferred = $q.defer();
-
-            $http.put('/api/v1/users/' + user.id + '/password', password).then(function (response) {
-                deferred.resolve(response);
-            }, function (response) {
-                deferred.resolve(response);
+            user.password = password;
+            $http.put('/api/v1/users/updatePassword/', user).success(function (data) {
+                deferred.resolve(data);
+            }).error(function (data) {
+                toasterService.ajaxInfo(data);
+                deferred.reject("An error occured while fetching the user.");
             });
 
             return deferred.promise;
@@ -1013,6 +1036,10 @@
         }
     }
 
+
+    function isValidPassword(password) {
+        return /^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$_! %*#?&])[A-Za-z\d$@$_! %*#?&]{15,}$/.test(password);
+    }
     //TODO: refactor roles names for the network server.
     function friendlyRoleName() {
         return function (input) {
@@ -1020,17 +1047,11 @@
             var friendlyName = '';
 
             switch (input) {
-                case 'ROLE_SYSTEM_ADMIN':
-                    friendlyName = "System Administrator";
-                    break;
                 case 'ADMIN':
                     friendlyName = "System Administrator";
                     break;
-                case 'ROLE_ORG_ADMIN':
-                    friendlyName = "Organization Administrator";
-                    break;
-                case 'ROLE_SUPPORT':
-                    friendlyName = "Support Technician";
+                case 'COUNSELOR':
+                    friendlyName = "Counselor";
                     break;
                 default:
                     friendlyName = "Unknown Role"
@@ -1040,5 +1061,5 @@
         };
     }
 
-
+var PASSWORD_REQUIREMENTS = "The password must be at least 15 characters long, contain 1 upper case letter, 1 lower case letter, 1 number and 1 special character $@$ _!%*#?&.";
 })();

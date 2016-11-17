@@ -6,6 +6,8 @@ import org.apache.commons.logging.LogFactory;
 import org.pesc.cds.model.Credentials;
 import org.pesc.cds.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.ws.rs.*;
@@ -15,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by prabhu on 11/10/16.
+ * Created by prabhu (prajendran@ccctechcenter.org) on 11/10/16.
  */
 @RestController
 @RequestMapping(value="api/v1/users")
@@ -88,79 +90,28 @@ public class UserController {
         return userService.create(user);
     }
 
-    /*@GET
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<Credentials> findUser(
-            @QueryParam("id") Integer id,
-            @QueryParam("name") String name,
-            @QueryParam("organizationId") Integer organizationId
-    ) {
 
-        checkOrganizationParameter(organizationId);
-
-        return userService.search(
-                id,
-                organizationId,
-                name);
-    }
-
-    @GET
-    @Path("/{id}")
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<Credentials> getUser(@PathParam("id") Integer id) {
-        ArrayList<Credentials> results = new ArrayList<Credentials>();
-
-        Credentials user = userService.findById(id);
-
-        if (user != null) {
-            results.add(user);
-        }
-
-        return results;
-    }
-
-
-    @POST
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Credentials createUser(Credentials user) {
-
-        return userService.create(user);
-    }
-
-    @Path("/{id}")
-    @PUT
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Credentials saveUser(@PathParam("id") Integer id, Credentials user) {
-        userService.update(user);
-        userService.updateSystemAdminEmails();
-
-        return user;
-    }
-
-    @Path("/{id}/password")
-    @PUT
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response updatePassword(@PathParam("id") Integer id, String password) {
+    @RequestMapping(value="/updatePassword", method= RequestMethod.PUT)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ResponseBody
+    public ResponseEntity<HttpStatus> updatePassword(@RequestBody Credentials user) {
 
         try {
-            userService.updatePassword(id, password);
+            userService.updatePassword(user.getId(), user.getPassword());
         }
-        catch (IllegalArgumentException e) {
-            //throw new ApiException(e, Response.Status.BAD_REQUEST, "/users/" + id + "/password");
-            log.error("Failed to convert to and from dates.", e);
+        catch (Exception e) {
+            e.printStackTrace();
+            log.error("Failed to update the password.", e);
         }
-
-        return Response.ok().build();
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 
-    @Path("/{id}")
-    @DELETE
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @RequestMapping(value = "/removeUser", method = RequestMethod.DELETE)
+    @Produces(MediaType.APPLICATION_JSON)
     public void removeUser(@PathParam("id") Integer id) {
         userService.delete(id);
 
-    }*/
-
+    }
 
 }

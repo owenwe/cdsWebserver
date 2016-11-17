@@ -389,7 +389,7 @@
                     <button ng-show="userCtrl.showForm()" type="submit" class="btn btn-default">
                         <span class="glyphicon glyphicon-floppy-disk"></span> Save
                     </button>
-                    <button type="button" uib-popover-template="'delete-user.html'" popover-trigger="focus" popover-placement="right" class="btn btn-default">
+                    <button type="button" ng-click="userCtrl.deleteUser()" class="btn btn-default">
                         <span class="glyphicon glyphicon-remove-circle"></span> Delete
                     </button>
                     <button type="button" class="btn btn-default" ng-click="userCtrl.showPasswordForm = true">

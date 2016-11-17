@@ -49,6 +49,10 @@ public class Credentials implements Serializable {
     @Column(name = "modified_time")
     private Date modifiedTime;
 
+    @Column(name="address")
+    private String address;
+
+
     @JoinTable(
             name="users_roles",
             joinColumns=
@@ -146,5 +150,13 @@ public class Credentials implements Serializable {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }
