@@ -11,12 +11,14 @@ INSERT INTO users (username,password,enabled,name)
 VALUES ('prabhu','$2a$10$Xdy5DAnmIa2pqAbi9rxyxOB/EqfymmVAsMZzXSb.mJ5BsCmAJLblm', true,'Prabhu Rajendran');
 
 
-
-INSERT INTO roles (name) VALUES ('ROLE_SYSTEM_ADMIN');
-INSERT INTO roles (name) VALUES ('ROLE_ORG_ADMIN');
-INSERT INTO roles (name) VALUES ('ROLE_SUPPORT');
+INSERT INTO roles (name) VALUES ('ADMIN');
+INSERT INTO roles (name) VALUES ('COUNSELOR');
 
 INSERT INTO users_roles (users_id, roles_id) VALUES (1,1);
 INSERT INTO users_roles (users_id, roles_id) VALUES (1,2);
+INSERT INTO users_roles (users_id, roles_id) VALUES (2,1);
 INSERT INTO users_roles (users_id, roles_id) VALUES (2,2);
+INSERT INTO users_roles (users_id, roles_id) VALUES (3,1);
 INSERT INTO users_roles (users_id, roles_id) VALUES (3,2);
+INSERT INTO users_roles (users_id, roles_id) VALUES (4,1);
+INSERT INTO users_roles (users_id, roles_id) VALUES (4,2);

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+
+    <changeSet id="1" author="prabhu" context="dev, ci, prod">
+        <comment>This changeSet is to create a user table for the Network Server.</comment>
+
+        <createTable tableName="users">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="username" type="varchar(128)">
+                <constraints unique="true" nullable="false"
+                             uniqueConstraintName="users_usename_unique"/>
+            </column>
+            <column name="password" type="varchar(128)">
+                <constraints nullable="false" />
+            </column>
+            <column name="name" type="varchar(60)" remarks="First and last name.">
+                <constraints nullable="true"/>
+            </column>
+            <column name="title" type="varchar(32)" remarks="Professional title within the organization.">
+            </column>
+            <column name="address" type="varchar(255)" remarks="Full address.">
+            </column>
+            <column name="created_time" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP" remarks="Created Time.">
+                <constraints nullable="true" />
+            </column>
+            <column name="modified_time" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP" remarks="Last Updated Time.">
+                <constraints nullable="true" />
+            </column>
+            <column name="telephone" type="varchar(32)">
+            </column>
+            <column name="email" type="varchar(128)">
+            </column>
+            <column name="enabled" type="boolean" defaultValueBoolean="true" remarks="Indicates whether the the account is enabled.">
+                <constraints nullable="false" />
+            </column>
+
+        </createTable>
+
+
+        <createTable tableName="roles">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="name" type="varchar(45)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="users_roles">
+            <column name="users_id" type="INT">
+                <constraints nullable="false" references="users(id)" foreignKeyName="fk_users"/>
+            </column>
+            <column name="roles_id" type="INT">
+                <constraints nullable="false" references="roles(id)" foreignKeyName="fk_roles"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey columnNames="users_id, roles_id"
+                       constraintName="pk_user_roles_ids"
+                       tableName="users_roles"/>
+
+    </changeSet>
+
+</databaseChangeLog>

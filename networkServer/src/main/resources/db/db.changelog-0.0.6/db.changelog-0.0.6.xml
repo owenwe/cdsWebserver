@@ -4,43 +4,11 @@
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
 
-	
-	<changeSet id="4" author="prabhu" context="dev, ci, qa, prod">
-		<comment>
-		This changeSet adds the user table.
-		</comment>
-		<sqlFile encoding="utf8" path="1-user.sql" relativeToChangelogFile="true" />
-	</changeSet>
-
-
-	<changeSet id="5" author="prabhu" context="dev, ci, qa, prod">
+	<changeSet id="1" author="prabhu" context="dev, ci, qa, prod">
 		<comment>
 			This change set adds a default super user to the users and roles..
 		</comment>
-		<sqlFile encoding="utf8" path="2-default-users.sql" relativeToChangelogFile="true" />
+		<sqlFile encoding="utf8" path="1-default-users.sql" relativeToChangelogFile="true" />
 	</changeSet>
-
-	<changeSet id="6" author="prabhu" context="dev, ci, qa, prod">
-		<comment>
-			This change set adds roles..
-		</comment>
-		<sqlFile encoding="utf8" path="3-default-roles.sql" relativeToChangelogFile="true" />
-	</changeSet>
-
-	<changeSet id="7" author="prabhu" context="dev, ci, qa, prod">
-		<comment>
-			This change set adds roles..
-		</comment>
-		<sqlFile encoding="utf8" path="4-default-userRoles.sql" relativeToChangelogFile="true" />
-	</changeSet>
-
-	<changeSet id="8" author="prabhu" context="dev, ci, qa, prod">
-		<comment>
-			This change set delete roles..
-		</comment>
-		<sqlFile encoding="utf8" path="5-delete_roles.sql" relativeToChangelogFile="true" />
-	</changeSet>
-
-
 
 </databaseChangeLog>
