@@ -6,14 +6,15 @@
 	<changeSet id="1" author="owenwe" context="dev, ci, prod">
 		<comment>This changeSet is the initial creation of the required base tables for the Network Server.</comment>
 
-		<createTable schemaName="pesc_networkserver" tableName="transactions">
-			<column name="id" type="INT UNSIGNED" autoIncrement="true">
+
+		<createTable tableName="transactions">
+			<column name="id" type="INT" autoIncrement="true">
 				<constraints nullable="false" primaryKey="true" />
 			</column>
-			<column name="recipient_id" type="INT UNSIGNED">
+			<column name="recipient_id" type="INT">
 				<constraints nullable="false" />
 			</column>
-			<column name="sender_id" type="INT UNSIGNED">
+			<column name="sender_id" type="INT">
 				<constraints nullable="false" />
 			</column>
 			<column name="file_format" type="varchar(32)">
@@ -25,11 +26,11 @@
 			<column name="department" type="varchar(32)">
 				<constraints nullable="true" />
 			</column>
-			<column name="file_size" type="BIGINT UNSIGNED"
+			<column name="file_size" type="BIGINT"
 				defaultValueNumeric="0">
 				<constraints nullable="false" />
 			</column>
-			<column name="operation" type="ENUM('SEND','RECEIVE')">
+			<column name="operation" type="varchar(15)">
 				<constraints nullable="true" />
 			</column>
 			<column name="occurred_at" type="TIMESTAMP">
@@ -41,16 +42,17 @@
 			<column name="error" type="TEXT">
 				<constraints nullable="true" />
 			</column>
-			<column name="acknowledged" type="BIT(1)" defaultValueBoolean="false">
+			<column name="acknowledged" type="boolean" defaultValueBoolean="false">
 				<constraints nullable="false" />
 			</column>
+
 		</createTable>
 
 	</changeSet>
 
-	<changeSet id="2" author="owenwe" context="dev, ci, prod">
+	<!--<changeSet id="2" author="owenwe" context="dev, ci, prod">
 		<comment></comment>
-		<sql dbms="mysql">ALTER TABLE `transactions` ENGINE=MyISAM</sql>
-	</changeSet>
+		<sql>ALTER TABLE transactions ENGINE=MyISAM</sql>
+	</changeSet>-->
 
 </databaseChangeLog>

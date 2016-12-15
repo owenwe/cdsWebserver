@@ -6,7 +6,7 @@
     <changeSet id="1" author="sallen" context="dev, ci, prod" >
         <comment>This changeSet adds the request_file_path field to the transactions table.</comment>
 
-        <sql dbms="mysql" >ALTER TABLE `transactions` ADD COLUMN `request_file_path` VARCHAR(256) NULL DEFAULT NULL AFTER `file_path`;</sql>
+        <sql>ALTER TABLE transactions ADD COLUMN request_file_path VARCHAR(256) NULL DEFAULT NULL;</sql>
 
     </changeSet>
 </databaseChangeLog>

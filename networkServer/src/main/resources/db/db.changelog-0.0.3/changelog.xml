@@ -6,8 +6,8 @@
     <changeSet id="3" author="owenwe" context="dev, ci, prod" >
         <comment>Adding colums to the transcaction table to handle attributes related to delivery status.</comment>
 
-        <sql dbms="mysql" >ALTER TABLE `transactions` ADD COLUMN `delivery_message` VARCHAR(512) NULL DEFAULT NULL AFTER `acknowledged`;</sql>
-        <sql dbms="mysql" >ALTER TABLE `transactions` ADD COLUMN `delivery_status` VARCHAR(32) NULL DEFAULT NULL AFTER `delivery_message`;</sql>
+        <sql>ALTER TABLE transactions ADD COLUMN delivery_message VARCHAR(512) NULL DEFAULT NULL;</sql>
+        <sql>ALTER TABLE transactions ADD COLUMN delivery_status VARCHAR(32) NULL DEFAULT NULL;</sql>
 
     </changeSet>
 </databaseChangeLog>

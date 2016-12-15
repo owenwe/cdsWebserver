@@ -6,7 +6,7 @@
     <changeSet id="3" author="owenwe" context="dev, ci, prod" >
         <comment>Adding colums to the transaction table to support asynchronous operations.</comment>
 
-        <sql dbms="mysql" >ALTER TABLE `transactions` ADD COLUMN `sender_transaction_id` INTEGER NULL DEFAULT NULL AFTER `id`;</sql>
+        <sql>ALTER TABLE transactions ADD COLUMN sender_transaction_id INTEGER NULL DEFAULT NULL;</sql>
 
     </changeSet>
 </databaseChangeLog>

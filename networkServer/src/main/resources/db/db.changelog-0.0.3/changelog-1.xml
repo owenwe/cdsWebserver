@@ -6,7 +6,7 @@
     <changeSet id="3" author="owenwe" context="dev, ci, prod" >
         <comment>Adding colums to the transcaction table to handle attributes related to delivery status.</comment>
 
-        <sql dbms="mysql" >ALTER TABLE `transactions` ADD COLUMN `ack_url` VARCHAR(256) NULL DEFAULT NULL AFTER `acknowledged`;</sql>
+        <sql>ALTER TABLE transactions ADD COLUMN ack_url VARCHAR(256) NULL DEFAULT NULL;</sql>
 
     </changeSet>
 </databaseChangeLog>
