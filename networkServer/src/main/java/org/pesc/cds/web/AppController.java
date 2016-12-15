@@ -6,8 +6,10 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.json.JSONObject;
 import org.pesc.cds.domain.Transaction;
+import org.pesc.cds.model.Credentials;
 import org.pesc.cds.repository.TransactionService;
 import org.pesc.cds.service.OrganizationService;
+import org.pesc.cds.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -20,12 +22,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.List;
 
 @Controller
 public class AppController {
@@ -38,12 +42,15 @@ public class AppController {
     @Value("${networkServer.id}")
     private String localServerId;
 
-
     @Autowired
     private OrganizationService organizationService;
 
+    @Autowired
+    private UserService userService;
 
-    private boolean hasRole(Collection<GrantedAuthority> authorities, String role) {
+
+
+    public static boolean hasRole(Collection<GrantedAuthority> authorities, String role) {
         boolean hasRole = false;
         for (GrantedAuthority authority : authorities) {
             hasRole = authority.getAuthority().equals(role);
@@ -71,8 +78,8 @@ public class AppController {
             Collection<GrantedAuthority> authorities = auth.getAuthorities();
             isAuthenticated = true;
 
-            //model.addAttribute("hasSupportRole", hasRole(authorities, "ROLE_SUPPORT"));
-            //model.addAttribute("hasAdminRole", hasRole(authorities, "ROLE_ADMIN"));
+            model.addAttribute("hasSupportRole", hasRole(authorities, "ROLE_SUPPORT"));
+            model.addAttribute("hasAdminRole", hasRole(authorities, "ADMIN"));
 
             // model.addAttribute("roles", roleRepo.findAll() );
         }
@@ -82,14 +89,24 @@ public class AppController {
         }
 
         model.addAttribute("isAuthenticated", isAuthenticated);
+        model.addAttribute("roles", userService.getRoles() );
 
 
-        if (isAuthenticated) {
+        /*if (isAuthenticated) {
             org.pesc.cds.model.User activeUser = new org.pesc.cds.model.User();
             activeUser.setName("Admin");
 
             model.addAttribute("activeUser", activeUser);
+        }*/
+        if(isAuthenticated) {
+            User auth = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            List<Credentials> netwkUser = userService.findByUsername(auth.getUsername());
+
+            if (netwkUser.size() == 1) {
+                model.addAttribute("activeUser", netwkUser.get(0));
+            }
         }
+
         return isAuthenticated;
 
     }
@@ -175,6 +192,24 @@ public class AppController {
     }
 
 
+    @RequestMapping("/users")
+    public String getUsersPage(Model model) {
+
+        buildCommonModel(model);
+
+        return "fragments :: users";
+    }
+
+    @RequestMapping({"/user-details"})
+    public String getUserDetails(HttpServletRequest request, Model model) {
+
+
+        buildCommonModel(model);
+
+        return "fragments :: user-details";
+    }
+
+
     @RequestMapping("/upload")
     public String getTransfersPage(Model model) {
 
@@ -198,7 +233,15 @@ public class AppController {
     public String getAboutPage(Model model) {
         buildCommonModel(model);
 
+
         return "fragments :: about";
     }
 
+    public UserService getUserService() {
+        return userService;
+    }
+
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
 }

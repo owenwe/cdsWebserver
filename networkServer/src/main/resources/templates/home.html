@@ -52,6 +52,11 @@
                         <a class="item" href="#upload">Upload</a>
                     </li>
 
+                    <li th:if="${isAuthenticated}==true" ng-class="{ active: nav.isActive('/users')}">
+                        <a class="item" href="#users">Users</a>
+                    </li>
+
+
                 </ul>
                 <ul th:if="${isAuthenticated}==false" class="nav navbar-nav navbar-right">
                     <ul class="nav navbar-nav">

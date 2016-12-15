@@ -61,9 +61,11 @@ public class OAuthServerConfig extends ResourceServerConfigurerAdapter {
         http
                 .requestMatchers()
                     .antMatchers(HttpMethod.POST, "/api/v1/transactions")
+                    .antMatchers(HttpMethod.POST, "/api/v1/users")
                     .antMatchers(HttpMethod.POST, "/api/v1/documents/inbox").and()
                 .authorizeRequests()
                     .antMatchers(HttpMethod.POST, "/api/v1/transactions").authenticated()
+                    .antMatchers(HttpMethod.POST, "/api/v1/users").authenticated()
                     .antMatchers(HttpMethod.POST, "/api/v1/documents/inbox").authenticated();
     }
 }
