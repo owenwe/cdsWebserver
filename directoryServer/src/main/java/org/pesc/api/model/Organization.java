@@ -18,7 +18,7 @@ import java.util.Set;
 @XmlRootElement(name = "Organization")
 @Entity
 @Table(name = "organization")
-@JsonPropertyOrder({"name", "website", "street", "city", "state", "zip", "organizationTypes", "schoolCodes"})
+@JsonPropertyOrder({"name", "website", "street", "city", "state", "zip", "organizationTypes", "schoolCodes", "createdTime", "modifiedTime"})
 @ApiModel
 public class Organization implements Serializable {
 

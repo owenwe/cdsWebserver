@@ -236,12 +236,8 @@
             <column name="organization_id" type="INT" remarks="foreign key to the organization table">
                 <constraints nullable="false"/>
             </column>
-            <column name="address" type="varchar(256)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="instructions" type="varchar(1024)">
-                <constraints nullable="false"/>
-            </column>
+            <column name="address" type="varchar(256)"/>
+            <column name="instructions" type="varchar(1024)"/>
             <column name="delivery_confirm" type="boolean"/>
             <column name="error" type="boolean"/>
             <column name="mode" type="varchar(20)">

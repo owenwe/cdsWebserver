@@ -2,22 +2,34 @@ package org.pesc;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.pesc.api.EndpointResource;
 import org.pesc.api.model.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.TestRestTemplate;
 import org.springframework.boot.test.WebIntegrationTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.*;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.init.ScriptException;
+import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URISyntaxException;
+import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -25,14 +37,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = DirectoryApplication.class)
-@WebIntegrationTest("server.port=0")  //let Spring select a random port to use.
-@DirtiesContext
+@ActiveProfiles({"h2"})
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class DirectoryApplicationTests {
 
 	@Value("${http.port}")   //Injects that actual port used in the test
 	int port;
+
+	@Autowired
+	JdbcTemplate jdbc;
 
 
 	//Test RestTemplate to invoke the APIs.
@@ -46,8 +60,21 @@ public class DirectoryApplicationTests {
 	}
 	private int directoryID = 2; //The directory ID for Butte College
 
-	@ClassRule
-	public static DockerContainerRule dockerContainerRule = new DockerContainerRule("cdswebserver_directoryserver_db_image");
+	//@ClassRule
+	//public static DockerContainerRule dockerContainerRule = new DockerContainerRule("cdswebserver_directoryserver_db_image");
+
+
+	@Before
+	public void before() throws ScriptException,SQLException {
+		//ScriptUtils.executeSqlScript(jdbc.getDataSource().getConnection(), new ClassPathResource("db/dropTables.sql"));
+		System.err.println("Before Its Done!!!");
+	}
+
+	@After
+	public void after() throws ScriptException,SQLException {
+		ScriptUtils.executeSqlScript(jdbc.getDataSource().getConnection(), new ClassPathResource("db/dropTables.sql"));
+		System.err.println("After Its Done!!!");
+	}
 
 	/**
 	 * Tests that the directory server home page is accessible.
@@ -112,6 +139,10 @@ public class DirectoryApplicationTests {
 		institution.put("zip", "95822");
 		institution.put("street", "3835 Freeport Blvd");
 		institution.put("telephone", "(916) 558-2351");
+		institution.put("createdTime", "2016-12-02");
+		institution.put("modifiedTime", "2016-12-02");
+
+
 
 		JSONObject organizationType = new JSONObject();
 		organizationType.put("id", 2);
@@ -323,6 +354,7 @@ public class DirectoryApplicationTests {
 		endpoint.setOrganization(getServiceProvider());
 		endpoint.setError(false);
 		endpoint.setMode("LIVE");
+		endpoint.setOperationalStatus("ACTIVE");
 
 		return endpoint;
 	}

@@ -29,7 +29,15 @@ public class Credentials {
     @Column(name = "enabled")
     private boolean enabled;
 
+
     @ManyToMany (fetch = FetchType.EAGER)
+    @JoinTable(
+            name="users_roles",
+            joinColumns=
+            @JoinColumn(name="users_id", referencedColumnName="id"),
+            inverseJoinColumns=
+            @JoinColumn(name="roles_id", referencedColumnName="id")
+    )
     private Set<Role> roles;
 
     public Set<Role> getRoles() {
