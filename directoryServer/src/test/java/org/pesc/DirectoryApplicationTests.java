@@ -64,15 +64,9 @@ public class DirectoryApplicationTests {
 	//public static DockerContainerRule dockerContainerRule = new DockerContainerRule("cdswebserver_directoryserver_db_image");
 
 
-	@Before
-	public void before() throws ScriptException,SQLException {
-		//ScriptUtils.executeSqlScript(jdbc.getDataSource().getConnection(), new ClassPathResource("db/dropTables.sql"));
-		System.err.println("Before Its Done!!!");
-	}
-
 	@After
 	public void after() throws ScriptException,SQLException {
-		ScriptUtils.executeSqlScript(jdbc.getDataSource().getConnection(), new ClassPathResource("db/dropTables.sql"));
+		ScriptUtils.executeSqlScript(jdbc.getDataSource().getConnection(), new ClassPathResource("db/dropDatabase.sql"));
 		System.err.println("After Its Done!!!");
 	}
 
