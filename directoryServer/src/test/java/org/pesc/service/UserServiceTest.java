@@ -47,32 +47,10 @@ public class UserServiceTest {
     @Autowired
     JdbcTemplate  jdbc;
 
-    //@Before
-    public void before() throws ScriptException,SQLException {
-       /* ScriptUtils.executeSqlScript(jdbc.getDataSource().getConnection(), new ClassPathResource("db/scripts/dropTables.sql"));
-        ScriptUtils.executeSqlScript(jdbc.getDataSource().getConnection(), new ClassPathResource("db/scripts/db.changelog-0.0.1/1-organization.sql"));
-        ScriptUtils.executeSqlScript(jdbc.getDataSource().getConnection(), new ClassPathResource("db/scripts/db.changelog-0.0.1/3-contact.sql"));
-        ScriptUtils.executeSqlScript(jdbc.getDataSource().getConnection(), new ClassPathResource("db/scripts/db.changelog-0.0.1/5-delivery_methods.sql"));
-        ScriptUtils.executeSqlScript(jdbc.getDataSource().getConnection(), new ClassPathResource("db/scripts/db.changelog-0.0.1/4-document_format.sql"));
-        ScriptUtils.executeSqlScript(jdbc.getDataSource().getConnection(), new ClassPathResource("db/scripts/db.changelog-0.0.1/6-endpoint.sql"));
-        ScriptUtils.executeSqlScript(jdbc.getDataSource().getConnection(), new ClassPathResource("db/scripts/db.changelog-0.0.2/1-add-document-formats.sql"));
-        ScriptUtils.executeSqlScript(jdbc.getDataSource().getConnection(), new ClassPathResource("db/scripts/db.changelog-0.0.2/2-default-organizations.sql"));
-        ScriptUtils.executeSqlScript(jdbc.getDataSource().getConnection(), new ClassPathResource("db/scripts/db.changelog-0.0.3/1-user.sql"));
-        ScriptUtils.executeSqlScript(jdbc.getDataSource().getConnection(), new ClassPathResource("db/scripts/db.changelog-0.0.3/2-default-users.sql"));
-        ScriptUtils.executeSqlScript(jdbc.getDataSource().getConnection(), new ClassPathResource("db/scripts/db.changelog-0.0.3/3-school-codes.sql"));
-        ScriptUtils.executeSqlScript(jdbc.getDataSource().getConnection(), new ClassPathResource("db/scripts/db.changelog-0.0.3/4-institutions-service-providers.sql"));
-        ScriptUtils.executeSqlScript(jdbc.getDataSource().getConnection(), new ClassPathResource("db/scripts/db.changelog-0.0.3/5-messages.sql"));
-        ScriptUtils.executeSqlScript(jdbc.getDataSource().getConnection(), new ClassPathResource("db/scripts/db.changelog-0.0.3/6-uploads.sql"));
-        ScriptUtils.executeSqlScript(jdbc.getDataSource().getConnection(), new ClassPathResource("db/scripts/db.changelog-0.0.4/oauth-secret-column.sql"));
-        ScriptUtils.executeSqlScript(jdbc.getDataSource().getConnection(), new ClassPathResource("db/scripts/db.changelog-0.0.4/default-oauth-token.sql"));
-        ScriptUtils.executeSqlScript(jdbc.getDataSource().getConnection(), new ClassPathResource("db/scripts/db.changelog-0.0.4/oauth-tokens.sql"));*/
 
-        //ScriptUtils.executeSqlScript(jdbc.getDataSource().getConnection(), new ClassPathResource("db/scripts/1-user.sql"));
-        //ScriptUtils.executeSqlScript(jdbc.getDataSource().getConnection(), new ClassPathResource("db/scripts/3-contact.sql"));
-    }
     @After
     public void after() throws ScriptException,SQLException {
-        ScriptUtils.executeSqlScript(jdbc.getDataSource().getConnection(), new ClassPathResource("db/scripts/dropTables.sql"));
+        ScriptUtils.executeSqlScript(jdbc.getDataSource().getConnection(), new ClassPathResource("db/scripts/dropDatabase.sql"));
         System.out.println("Its Done!!!");
     }
 
