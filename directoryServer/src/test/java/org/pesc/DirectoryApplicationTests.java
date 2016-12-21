@@ -67,7 +67,6 @@ public class DirectoryApplicationTests {
 	@After
 	public void after() throws ScriptException,SQLException {
 		ScriptUtils.executeSqlScript(jdbc.getDataSource().getConnection(), new ClassPathResource("db/dropDatabase.sql"));
-		System.err.println("After Its Done!!!");
 	}
 
 	/**

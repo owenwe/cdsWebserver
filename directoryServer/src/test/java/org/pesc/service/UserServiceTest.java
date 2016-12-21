@@ -51,7 +51,6 @@ public class UserServiceTest {
     @After
     public void after() throws ScriptException,SQLException {
         ScriptUtils.executeSqlScript(jdbc.getDataSource().getConnection(), new ClassPathResource("db/scripts/dropDatabase.sql"));
-        System.out.println("Its Done!!!");
     }
 
     @Autowired
