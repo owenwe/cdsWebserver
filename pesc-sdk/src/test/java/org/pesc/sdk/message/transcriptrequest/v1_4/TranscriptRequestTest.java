@@ -17,21 +17,22 @@
 package org.pesc.sdk.message.transcriptrequest.v1_4;
 
 import org.junit.Test;
-import org.pesc.sdk.core.coremain.v1_14.*;
+import org.pesc.sdk.codes.iso_3166_1.v1_0.CountryAlpha2CodeSimpleType;
+import org.pesc.sdk.core.coremain.v1_19.*;
 import org.pesc.sdk.message.documentinfo.v1_0.DocumentInfo;
 import org.pesc.sdk.message.documentinfo.v1_0.DocumentInfoType;
 import org.pesc.sdk.message.documentinfo.v1_0.DocumentInfoValidator;
 import org.pesc.sdk.message.documentinfo.v1_0.DocumentTypeCode;
 import org.pesc.sdk.message.functionalacknowledgement.v1_2.ValidationResponse;
-import org.pesc.sdk.sector.academicrecord.v1_9.*;
-import org.pesc.sdk.sector.academicrecord.v1_9.AddressType;
-import org.pesc.sdk.sector.academicrecord.v1_9.AttendanceType;
-import org.pesc.sdk.sector.academicrecord.v1_9.ContactsType;
-import org.pesc.sdk.sector.academicrecord.v1_9.EmailType;
-import org.pesc.sdk.sector.academicrecord.v1_9.OrganizationType;
-import org.pesc.sdk.sector.academicrecord.v1_9.PersonType;
-import org.pesc.sdk.sector.academicrecord.v1_9.PhoneType;
-import org.pesc.sdk.sector.academicrecord.v1_9.TransmissionDataType;
+import org.pesc.sdk.sector.academicrecord.v1_13.*;
+import org.pesc.sdk.sector.academicrecord.v1_13.AddressType;
+import org.pesc.sdk.sector.academicrecord.v1_13.AttendanceType;
+import org.pesc.sdk.sector.academicrecord.v1_13.ContactsType;
+import org.pesc.sdk.sector.academicrecord.v1_13.EmailType;
+import org.pesc.sdk.sector.academicrecord.v1_13.OrganizationType;
+import org.pesc.sdk.sector.academicrecord.v1_13.PersonType;
+import org.pesc.sdk.sector.academicrecord.v1_13.PhoneType;
+import org.pesc.sdk.sector.academicrecord.v1_13.TransmissionDataType;
 import org.pesc.sdk.util.ValidationUtils;
 import org.pesc.sdk.util.XmlFileType;
 import org.pesc.sdk.util.XmlSchemaVersion;
@@ -407,7 +408,8 @@ public class TranscriptRequestTest {
                                 sendersCity = address.getCity();
                                 sendersState = address.getStateProvinceCode();//Domestic
                                 sendersPostalCode = address.getPostalCode();
-                                sendersCountry = address.getCountryCode()!=null?address.getCountryCode().toString(): CountryCodeType.US.toString();
+                                sendersCountry = address.getCountryCode()!=null?address.getCountryCode().toString():
+                                    CountryAlpha2CodeSimpleType.US.value();
                             }
                         }
                     }
@@ -583,7 +585,8 @@ public class TranscriptRequestTest {
                                 receiversState = stateProvinceCodeType.toString();
                             }
                             receiversPostalCode = address.getPostalCode();
-                            receiversCountry = address.getCountryCode()!=null?address.getCountryCode().toString(): CountryCodeType.US.toString();
+                            receiversCountry = address.getCountryCode()!=null?address.getCountryCode().toString():
+                                CountryAlpha2CodeSimpleType.US.value();
                         }
                     }
                 }

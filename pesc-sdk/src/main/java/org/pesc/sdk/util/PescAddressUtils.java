@@ -16,10 +16,13 @@
 
 package org.pesc.sdk.util;
 
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+
 import org.apache.commons.lang3.StringUtils;
-import org.pesc.sdk.core.coremain.v1_14.CountryCodeType;
-import org.pesc.sdk.core.coremain.v1_14.StateProvinceCodeType;
-import org.pesc.sdk.sector.academicrecord.v1_9.AddressType;
+
+import org.pesc.sdk.codes.iso_3166_1.v1_0.CountryAlpha2CodeSimpleType;
+import org.pesc.sdk.core.coremain.v1_19.AddressType;
+import org.pesc.sdk.core.coremain.v1_19.StateProvinceCodeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,12 +36,12 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class PescAddressUtils {
-    public static final Logger logger = LoggerFactory.getLogger(PescAddressUtils.class);
+    private static final Logger log = LoggerFactory.getLogger(PescAddressUtils.class);
 
     private static final Map<String, String> iso3Toiso2CountryCodeMap;
 
     // used to accommodate non-ISO2/ISO3 or out-of-date country string
-    private static final Map<CountryCodeType, List<String>> countryAliases;
+    private static final Map<CountryAlpha2CodeSimpleType, List<String>> countryAliases;
 
     // contains US and CA states
     private static final Map<String, String> stateMap;
@@ -51,39 +54,39 @@ public class PescAddressUtils {
             iso3Toiso2CountryCodeMap.put(locale.getISO3Country(), country);
         }
 
-        countryAliases = new HashMap<CountryCodeType, List<String>>();
+        countryAliases = new HashMap<CountryAlpha2CodeSimpleType, List<String>>();
 
         List<String> aliases = new ArrayList<String>();
         aliases.add("USA");
         aliases.add("UNITED STATES");
         aliases.add("UNITED STATES OF AMERICA");
-        countryAliases.put(CountryCodeType.US, aliases);
+        countryAliases.put(CountryAlpha2CodeSimpleType.US, aliases);
 
         aliases = new ArrayList<String>();
         aliases.add("CANADA");
-        countryAliases.put(CountryCodeType.CA, aliases);
+        countryAliases.put(CountryAlpha2CodeSimpleType.CA, aliases);
 
         aliases = new ArrayList<String>();
         aliases.add("YU");
-        countryAliases.put(CountryCodeType.MK, aliases);
+        countryAliases.put(CountryAlpha2CodeSimpleType.MK, aliases);
 
         aliases = new ArrayList<String>();
         aliases.add("PI");
-        countryAliases.put(CountryCodeType.PH, aliases);
+        countryAliases.put(CountryAlpha2CodeSimpleType.PH, aliases);
 
         aliases = new ArrayList<String>();
         aliases.add("AC");
-        countryAliases.put(CountryCodeType.SH, aliases);
+        countryAliases.put(CountryAlpha2CodeSimpleType.SH, aliases);
 
         aliases = new ArrayList<String>();
         aliases.add("TP");
-        countryAliases.put(CountryCodeType.TL, aliases);
+        countryAliases.put(CountryAlpha2CodeSimpleType.TL, aliases);
 
         // this is an incorrect alias to work around the new country code
         // that is not part of PESC country enumeration list
         aliases = new ArrayList<String>();
         aliases.add("SX");
-        countryAliases.put(CountryCodeType.NL, aliases);
+        countryAliases.put(CountryAlpha2CodeSimpleType.NL, aliases);
 
         stateMap = new HashMap<String, String>();
         stateMap.put("Alabama","AL");
@@ -167,21 +170,21 @@ public class PescAddressUtils {
      * @param countryStr
      * @return
      */
-    public static CountryCodeType getCountryCode(String countryStr) {
-        CountryCodeType countryCode = null;
+    public static CountryAlpha2CodeSimpleType getCountryCode(String countryStr) {
+        CountryAlpha2CodeSimpleType countryCode = null;
 
         countryStr = StringUtils.strip(countryStr, " \"");
-        if (countryStr==null || countryStr.isEmpty()) {
-            logger.debug("null country string: " + countryStr);
+        if (countryStr==null || isEmpty(countryStr)) {
+            log.debug("null country string: " + countryStr);
             // use US as the default country
-            return CountryCodeType.US;
+            return CountryAlpha2CodeSimpleType.US;
         }
         countryStr = countryStr.toUpperCase();
 
         Set<String> iso3CountryCodes = iso3Toiso2CountryCodeMap.keySet();
         Collection<String> iso2CountryCodes = iso3Toiso2CountryCodeMap.values();
 
-        for (Map.Entry<CountryCodeType, List<String>> entry: countryAliases.entrySet()) {
+        for (Map.Entry<CountryAlpha2CodeSimpleType, List<String>> entry: countryAliases.entrySet()) {
             for (String alias: entry.getValue()) {
                 if (alias.equals(countryStr)) {
                     countryCode = entry.getKey();
@@ -192,11 +195,11 @@ public class PescAddressUtils {
 
         if (iso3CountryCodes.contains(countryStr)) {
             String iso2CountryCode = iso3Toiso2CountryCodeMap.get(countryStr);
-            countryCode = CountryCodeType.valueOf(iso2CountryCode);
+            countryCode = CountryAlpha2CodeSimpleType.valueOf(iso2CountryCode);
         } else if (iso2CountryCodes.contains(countryStr)) {
-            countryCode = CountryCodeType.valueOf(countryStr);
+            countryCode = CountryAlpha2CodeSimpleType.valueOf(countryStr);
         } else {
-            logger.warn("Invalid country string: " + countryStr);
+            log.warn("Invalid country string: " + countryStr);
             countryCode = null;
         }
 
@@ -211,12 +214,12 @@ public class PescAddressUtils {
      * @return
      */
 
-    public static StateProvinceCodeType getStateProvinceCode(String stateStr, CountryCodeType countryCode) {
+    public static StateProvinceCodeType getStateProvinceCode(String stateStr, CountryAlpha2CodeSimpleType countryCode) {
         // only provides StateProvinceCode for US and CA
-        if (!(countryCode.equals(CountryCodeType.CA) || countryCode.equals(CountryCodeType.US))) return null;
+        if (!(countryCode.equals(CountryAlpha2CodeSimpleType.CA) || countryCode.equals(CountryAlpha2CodeSimpleType.US))) return null;
 
         stateStr = StringUtils.strip(stateStr, " \"");
-        if (stateStr==null || stateStr.isEmpty()) {
+        if (stateStr==null || isEmpty(stateStr)) {
             return null;
         }
 
@@ -228,7 +231,7 @@ public class PescAddressUtils {
             try {
                 stateProvinceCode = StateProvinceCodeType.valueOf(stateStr);
             } catch (Exception e) {
-                logger.warn("Exception thrown in parsing state string: " + stateStr, e);
+                log.warn("Exception thrown in parsing state string: " + stateStr, e);
             }
         } else {
             stateStr = toCamelCase(stateStr);
@@ -236,7 +239,7 @@ public class PescAddressUtils {
                 try {
                     stateProvinceCode = StateProvinceCodeType.valueOf(stateMap.get(stateStr));
                 } catch (Exception e) {
-                    logger.warn("Exception thrown in parsing state string: " + stateStr, e);
+                    log.warn("Exception thrown in parsing state string: " + stateStr, e);
                 }
             }
         }
@@ -263,10 +266,10 @@ public class PescAddressUtils {
      * @param stateProvinceCodeType
      * @return
      */
-    public static CountryCodeType getCountry(StateProvinceCodeType stateProvinceCodeType){
-        CountryCodeType countryCodeType = null;
+    public static CountryAlpha2CodeSimpleType getCountry(StateProvinceCodeType stateProvinceCodeType){
+        CountryAlpha2CodeSimpleType countryCodeType = null;
         if(stateProvinceCodeType!=null) {
-            countryCodeType = CountryCodeType.US;//Canada if one of Canadian Provinces otherwise it's US.
+            countryCodeType = CountryAlpha2CodeSimpleType.US;//Canada if one of Canadian Provinces otherwise it's US.
             switch (stateProvinceCodeType) {//notice I don't have breaks, these are all fall through.  Make sure you add breaks if you want different behavior.
                 case AB:
                 case BC:
@@ -280,7 +283,7 @@ public class PescAddressUtils {
                 case QC:
                 case SK:
                 case YT:
-                    countryCodeType = CountryCodeType.CA;
+                    countryCodeType = CountryAlpha2CodeSimpleType.CA;
                     break;
             }
         }
@@ -324,12 +327,13 @@ public class PescAddressUtils {
                 } else {
                     postalCode = zip;
                 }
-                CountryCodeType countryCodeType = PescAddressUtils.getCountry(stateProvinceCodeType);//We can figure out Country based on StateProvinceCode
+                CountryAlpha2CodeSimpleType countryCodeType = PescAddressUtils.getCountry(stateProvinceCodeType);//We can figure out Country based on
+                // StateProvinceCode
                 if (countryCodeType != null) {
                     country = countryCodeType.toString();
                 }
             }else{//International
-                CountryCodeType countryCodeType = address.getCountryCode();
+                CountryAlpha2CodeSimpleType countryCodeType = address.getCountryCode();
                 if(countryCodeType!=null){
                     country = countryCodeType.toString();
                     state = address.getStateProvince();//StateProvince optional

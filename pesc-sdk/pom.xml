@@ -22,7 +22,7 @@
 
     <groupId>org.pesc</groupId>
     <artifactId>pesc-sdk</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2</version>
     <packaging>jar</packaging>
 
     <properties>

@@ -18,11 +18,23 @@ package org.pesc.sdk.message.transcriptrequest.v1_4;
 
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
-import org.pesc.sdk.core.coremain.v1_14.DocumentTypeCodeType;
-import org.pesc.sdk.core.coremain.v1_14.SeverityCodeType;
-import org.pesc.sdk.core.coremain.v1_14.TransmissionTypeType;
+import org.pesc.sdk.core.coremain.v1_19.DocumentTypeCodeType;
+import org.pesc.sdk.core.coremain.v1_19.SeverityCodeType;
+import org.pesc.sdk.core.coremain.v1_19.TransmissionTypeType;
 import org.pesc.sdk.message.functionalacknowledgement.v1_2.ValidationResponse;
-import org.pesc.sdk.sector.academicrecord.v1_9.*;
+import org.pesc.sdk.sector.academicrecord.v1_13.AcademicAwardsReportedType;
+import org.pesc.sdk.sector.academicrecord.v1_13.AddressType;
+import org.pesc.sdk.sector.academicrecord.v1_13.AttendanceType;
+import org.pesc.sdk.sector.academicrecord.v1_13.ContactsType;
+import org.pesc.sdk.sector.academicrecord.v1_13.EmailType;
+import org.pesc.sdk.sector.academicrecord.v1_13.OrganizationType;
+import org.pesc.sdk.sector.academicrecord.v1_13.PersonType;
+import org.pesc.sdk.sector.academicrecord.v1_13.PhoneType;
+import org.pesc.sdk.sector.academicrecord.v1_13.ReleaseAuthorizedMethodType;
+import org.pesc.sdk.sector.academicrecord.v1_13.RequestType;
+import org.pesc.sdk.sector.academicrecord.v1_13.RequestedStudentType;
+import org.pesc.sdk.sector.academicrecord.v1_13.SourceDestinationType;
+import org.pesc.sdk.sector.academicrecord.v1_13.TransmissionDataType;
 import org.pesc.sdk.util.PescAddress;
 import org.pesc.sdk.util.PescAddressUtils;
 import org.pesc.sdk.util.ValidationUtils;
@@ -37,7 +49,7 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class TranscriptRequestValidator {
-    private static final org.pesc.sdk.sector.academicrecord.v1_9.ObjectFactory academicRecordObjectFactory = new org.pesc.sdk.sector.academicrecord.v1_9.ObjectFactory();
+  private static final org.pesc.sdk.sector.academicrecord.v1_13.ObjectFactory academicRecordObjectFactory = new org.pesc.sdk.sector.academicrecord.v1_13.ObjectFactory();
 
     public static ValidationResponse validateTranscriptRequestRequiredContent(org.pesc.sdk.message.transcriptrequest.v1_4.TranscriptRequest transcriptRequest){
         ValidationResponse validationResponse = new ValidationResponse();
@@ -158,7 +170,9 @@ public class TranscriptRequestValidator {
         ValidationUtils.checkNotNull(documentTypeCode, "TranscriptRequest.TransmissionData.DocumentTypeCode"+missingRequiredText, validationResponse, SeverityCodeType.ERROR);
         ValidationUtils.checkArgument(StringUtils.isNotBlank(createDateTime), "TranscriptRequest.TransmissionData.CreatedDateTime"+missingRequiredText, validationResponse, SeverityCodeType.ERROR);
         ValidationUtils.checkNotNull(transmissionType, "TranscriptRequest.TransmissionData.TransmissionType"+missingRequiredText, validationResponse, SeverityCodeType.ERROR);
-        ValidationUtils.checkArgument(senderSchoolCodeProvided, "TranscriptRequest.TransmissionData.Source.Organization OPEID, NCHELPID, IPEDS, ATP, FICE, ACT, CCD, PSS, CEEBACT, CSIS, USIS, ESIS, PSIS, DUNS, MutuallyDefined"+missingOneRequiredText, validationResponse, SeverityCodeType.ERROR);
+        ValidationUtils.checkArgument(senderSchoolCodeProvided, "TranscriptRequest.TransmissionData.Source"
+            + ".Organization OPEID, NCHELPID, IPEDS, ATP, FICE, ACT, CCD, PSS, CEEBACT, CSIS, USIS, ESIS, PSIS, DUNS,"
+            + " GEOCode, MutuallyDefined"+missingOneRequiredText, validationResponse, SeverityCodeType.ERROR);
         ValidationUtils.checkArgument(StringUtils.isNotBlank(sendersName), "TranscriptRequest.TransmissionData.Source.Organization.OrganizationName"+missingRequiredText, validationResponse, SeverityCodeType.ERROR);
         if(sendersAddress!=null) {
             if(!addressValid){
@@ -179,7 +193,9 @@ public class TranscriptRequestValidator {
         }else{
             ValidationUtils.checkNotNull(sendersAddress, "TranscriptRequest.TransmissionData.Source.Organization.Contacts.Address" + missingRequiredText, validationResponse, SeverityCodeType.ERROR);
         }
-        ValidationUtils.checkArgument(receiverSchoolCodeProvided, "TranscriptRequest.TransmissionData.Destination.Organization OPEID, NCHELPID, IPEDS, ATP, FICE, ACT, CCD, PSS, CEEBACT, CSIS, USIS, ESIS, PSIS, DUNS, MutuallyDefined"+missingOneRequiredText, validationResponse, SeverityCodeType.ERROR);
+        ValidationUtils.checkArgument(receiverSchoolCodeProvided, "TranscriptRequest.TransmissionData.Destination"
+            + ".Organization OPEID, NCHELPID, IPEDS, ATP, FICE, ACT, CCD, PSS, CEEBACT, CSIS, USIS, ESIS, PSIS, DUNS,"
+            + " GEOCode, MutuallyDefined"+missingOneRequiredText, validationResponse, SeverityCodeType.ERROR);
         ValidationUtils.checkArgument(StringUtils.isNotBlank(receiversName), "TranscriptRequest.TransmissionData.Destination.Organization.OrganizationName"+missingRequiredText, validationResponse, SeverityCodeType.ERROR);
         ValidationUtils.checkArgument(StringUtils.isNotBlank(requestedStudentFirstName), "TranscriptRequest.Request.RequestedStudent.Person.Name.FirstName"+missingRequiredText, validationResponse, SeverityCodeType.ERROR);
         ValidationUtils.checkArgument(StringUtils.isNotBlank(requestedStudentLastName), "TranscriptRequest.Request.RequestedStudent.Person.Name.LastName"+missingRequiredText, validationResponse, SeverityCodeType.ERROR);
@@ -394,7 +410,7 @@ public class TranscriptRequestValidator {
     }
 
     private static boolean isSchoolCodeProvided(OrganizationType organizationType){
-        return StringUtils.isNotBlank(organizationType.getOPEID()) || StringUtils.isNotBlank(organizationType.getNCHELPID()) || StringUtils.isNotBlank(organizationType.getIPEDS()) || StringUtils.isNotBlank(organizationType.getATP()) || StringUtils.isNotBlank(organizationType.getFICE()) || StringUtils.isNotBlank(organizationType.getACT()) || StringUtils.isNotBlank(organizationType.getCCD()) || StringUtils.isNotBlank(organizationType.getPSS()) || StringUtils.isNotBlank(organizationType.getCEEBACT()) || StringUtils.isNotBlank(organizationType.getCSIS()) || StringUtils.isNotBlank(organizationType.getUSIS()) || StringUtils.isNotBlank(organizationType.getESIS()) || StringUtils.isNotBlank(organizationType.getPSIS()) || StringUtils.isNotBlank(organizationType.getDUNS()) || StringUtils.isNotBlank(organizationType.getMutuallyDefined());
+        return StringUtils.isNotBlank(organizationType.getOPEID()) || StringUtils.isNotBlank(organizationType.getNCHELPID()) || StringUtils.isNotBlank(organizationType.getIPEDS()) || StringUtils.isNotBlank(organizationType.getATP()) || StringUtils.isNotBlank(organizationType.getFICE()) || StringUtils.isNotBlank(organizationType.getACT()) || StringUtils.isNotBlank(organizationType.getCCD()) || StringUtils.isNotBlank(organizationType.getPSS()) || StringUtils.isNotBlank(organizationType.getCEEBACT()) || StringUtils.isNotBlank(organizationType.getCSIS()) || StringUtils.isNotBlank(organizationType.getUSIS()) || StringUtils.isNotBlank(organizationType.getESIS()) || StringUtils.isNotBlank(organizationType.getPSIS()) || StringUtils.isNotBlank(organizationType.getDUNS()) || StringUtils.isNotBlank(organizationType.getGEOCode()) || StringUtils.isNotBlank(organizationType.getMutuallyDefined());
     }
 
 }
