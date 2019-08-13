@@ -229,9 +229,10 @@ public class OrganizationsResource {
     @Path("/{id}/school-code")
     @PUT
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    @ApiOperation("Add or update a school code for the institution. Code types include 'FICE', 'ATP', 'ACT', 'IPEDS' and 'OPEID'")
+    @ApiOperation("Add or update a school code for the institution. Code types include 'FICE', 'ATP', 'ACT', 'IPEDS',"
+            + " 'GEOCODE', and 'OPEID'")
     public SchoolCode putSchoolCode(@PathParam("id") @ApiParam("The identifier for the organization.") Integer id,
-                              @FormParam("code-type") @ApiParam("'FICE', 'ATP', 'ACT', 'IPEDS' or 'OPEID'") String codeType,
+                              @FormParam("code-type") @ApiParam("'FICE', 'ATP', 'ACT', 'IPEDS', 'GEOCODE' or 'OPEID'") String codeType,
                               @FormParam("code") String code) {
 
         SchoolCode schoolCode = new SchoolCode();

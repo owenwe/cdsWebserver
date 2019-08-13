@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+  <changeSet id="organizationTableDropNotNullConstraintFromOrganizationStateColumn" author="Andrew John Connell" context="dev, ci, prod">
+    <dropNotNullConstraint tableName="organization" columnName="state"/>
+  </changeSet>
+
+  <changeSet id="organizationTableIntroduceCountryField" author="Andrew John Connell" context="dev, ci, prod">
+    <addColumn tableName="organization">
+      <!--    Defined in XSD as being ISO3166 Country Code (2 Characters)    -->
+      <column name="country" type="VARCHAR(2)"/>
+    </addColumn>
+
+    <!--    The following modifications bring the max size of fields in line with XSD definitions    -->
+    <modifyDataType tableName="organization" columnName="city" newDataType="VARCHAR(30)"/>
+    <modifyDataType tableName="organization" columnName="state" newDataType="VARCHAR(30)"/>
+    <modifyDataType tableName="organization" columnName="zip" newDataType="VARCHAR(17)"/>
+    <modifyDataType tableName="organization" columnName="street" newDataType="VARCHAR(40)"/>
+
+  </changeSet>
+</databaseChangeLog>

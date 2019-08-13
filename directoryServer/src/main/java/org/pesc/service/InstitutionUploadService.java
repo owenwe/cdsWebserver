@@ -16,6 +16,8 @@
 
 package org.pesc.service;
 
+import static org.apache.commons.lang.StringUtils.isBlank;
+
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -25,6 +27,7 @@ import org.pesc.api.StringUtils;
 import org.pesc.api.model.*;
 import org.pesc.api.repository.InstitutionUploadResultsRepository;
 import org.pesc.api.repository.InstitutionUploadsRepository;
+import org.pesc.model.enums.SchoolCodeType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Async;
@@ -50,8 +53,9 @@ public class InstitutionUploadService {
     private static final Log log = LogFactory.getLog(InstitutionUploadService.class);
 
     private static final int MAX_COLUMNS = 11;
-    private static String[] REQUIRED_COLUMNS_NAMES = {"name","city","state","atp","act","ipeds","opeid","fice","cds","ceeb" };
-    private static String[] OPTINOAL_COLUMN_NAMES = { "website","street","zip" };
+    private static String[] REQUIRED_COLUMNS_NAMES = {"name", "city", "state", "act", "atp", "cds", "ceeb", "fice",
+        "geocode", "ipeds", "opeid"};
+    private static String[] OPTIONAL_COLUMN_NAMES = {"website", "street", "zip"};
 
 
     @Autowired
@@ -69,56 +73,58 @@ public class InstitutionUploadService {
     @Autowired
     private InstitutionUploadResultsRepository resultsRepository;
 
-    @Transactional(readOnly=false,propagation = Propagation.REQUIRED)
-    @PreAuthorize("(#institutionsUpload.organizationId == principal.organizationId AND  hasRole('ROLE_ORG_ADMIN') ) OR hasRole('ROLE_SYSTEM_ADMIN')")
-    public InstitutionsUpload create(InstitutionsUpload institutionsUpload)  {
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+    @PreAuthorize("(#institutionsUpload.organizationId == principal.organizationId AND hasRole('ROLE_ORG_ADMIN') ) OR "
+        + "hasRole('ROLE_SYSTEM_ADMIN')")
+    public InstitutionsUpload create(InstitutionsUpload institutionsUpload) {
         return uploadsRepository.save(institutionsUpload);
     }
 
-    @Transactional(readOnly=false,propagation = Propagation.REQUIRED)
-    @PreAuthorize("(#institutionsUpload.organizationId == principal.organizationId AND  hasRole('ROLE_ORG_ADMIN') ) OR hasRole('ROLE_SYSTEM_ADMIN')")
-    public InstitutionsUpload update(InstitutionsUpload institutionsUpload)  {
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+    @PreAuthorize("(#institutionsUpload.organizationId == principal.organizationId AND hasRole('ROLE_ORG_ADMIN') ) OR "
+        + "hasRole('ROLE_SYSTEM_ADMIN')")
+    public InstitutionsUpload update(InstitutionsUpload institutionsUpload) {
         return uploadsRepository.save(institutionsUpload);
     }
 
-    @Transactional(readOnly=true,propagation = Propagation.REQUIRED)
-    @PreAuthorize("(#orgID == principal.organizationId AND  hasRole('ROLE_ORG_ADMIN') ) OR hasRole('ROLE_SYSTEM_ADMIN')")
-    public List<InstitutionsUpload> getUploadsByOrganization(Integer orgID)  {
+    @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
+    @PreAuthorize(
+        "(#orgID == principal.organizationId AND  hasRole('ROLE_ORG_ADMIN') ) OR hasRole('ROLE_SYSTEM_ADMIN')")
+    public List<InstitutionsUpload> getUploadsByOrganization(Integer orgID) {
         return uploadsRepository.findByOrgId(orgID);
     }
 
-    @Transactional(readOnly=true,propagation = Propagation.REQUIRED)
-    @PostAuthorize("( (returnObject.organizationId == principal.organizationId AND hasRole('ROLE_ORG_ADMIN') ) OR hasRole('ROLE_SYSTEM_ADMIN'))")
-    public InstitutionsUpload getUploadById(Integer uploadId)  {
+    @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
+    @PostAuthorize("( (returnObject.organizationId == principal.organizationId AND hasRole('ROLE_ORG_ADMIN') ) OR"
+        + " hasRole('ROLE_SYSTEM_ADMIN'))")
+    public InstitutionsUpload getUploadById(Integer uploadId) {
         return uploadsRepository.findOne(uploadId);
     }
 
-    @Transactional(readOnly=true,propagation = Propagation.REQUIRED)
-    public List<InstitutionsUploadResult> getUploadResultsByUploadId(Integer uploadId)  {
+    @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
+    public List<InstitutionsUploadResult> getUploadResultsByUploadId(Integer uploadId) {
         return resultsRepository.findByUploadId(uploadId);
     }
 
-    @Transactional(readOnly=true,propagation = Propagation.REQUIRED)
-    public List<InstitutionsUploadResult> getUploadResultsByOrgId(Integer orgID)  {
+    @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
+    public List<InstitutionsUploadResult> getUploadResultsByOrgId(Integer orgID) {
         return resultsRepository.findByOrgId(orgID);
     }
 
-
-    @Transactional(readOnly=false,propagation = Propagation.REQUIRED)
-    public InstitutionsUploadResult create(InstitutionsUploadResult institutionsResultUpload)  {
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+    public InstitutionsUploadResult create(InstitutionsUploadResult institutionsResultUpload) {
         return resultsRepository.save(institutionsResultUpload);
     }
 
-
-    @Transactional(readOnly=true)
-    public List<CSVStatusDTO> getCSVStatus(Integer uploadID)  {
-
-        String sql = "SELECT iur.line_number, iu.end_time FROM institution_uploads iu JOIN institution_upload_results iur on iur.institution_upload_id = iu.id WHERE iu.id = ? order by iur.line_number DESC LIMIT 1";
-        List<Map<String,Object>> rows = jdbcTemplate.queryForList(sql, uploadID);
+    @Transactional(readOnly = true)
+    public List<CSVStatusDTO> getCSVStatus(Integer uploadID) {
+        String sql = "SELECT iur.line_number, iu.end_time FROM institution_uploads iu JOIN institution_upload_results"
+            + " iur on iur.institution_upload_id = iu.id WHERE iu.id = ? order by iur.line_number DESC LIMIT 1";
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql, uploadID);
 
         ArrayList<CSVStatusDTO> statusList = new ArrayList<CSVStatusDTO>();
 
-        for(Map row : rows) {
+        for (Map row : rows) {
             CSVStatusDTO status = new CSVStatusDTO();
             status.setLineNumber((Integer) row.get("line_Number"));
             java.sql.Timestamp dateTime = (java.sql.Timestamp)row.get("end_time");
@@ -128,25 +134,21 @@ public class InstitutionUploadService {
             statusList.add(status);
         }
 
-
         return statusList;
     }
 
-
-    private boolean isValidUploadFile(Map<String,Integer> headerMap) {
-
-        for(String columnName : REQUIRED_COLUMNS_NAMES) {
+    private boolean isValidUploadFile(Map<String, Integer> headerMap) {
+        for (String columnName : REQUIRED_COLUMNS_NAMES) {
 
             if (!headerMap.containsKey(columnName)) {
                 return false;
             }
         }
         return true;
-
     }
 
-    private void addSchoolCode(Set<SchoolCode> schoolCodes, String codeType, String code){
-        if (!StringUtils.isEmpty(code)){
+    private void addSchoolCode(Set<SchoolCode> schoolCodes, String codeType, String code) {
+        if (!StringUtils.isEmpty(code)) {
             SchoolCode schoolCode = new SchoolCode();
             schoolCode.setCodeType(codeType);
             schoolCode.setCode(code);
@@ -166,13 +168,15 @@ public class InstitutionUploadService {
             final Reader reader = new InputStreamReader(new FileInputStream(new File(filePath)), "UTF-8");
             final CSVParser parser = new CSVParser(reader, CSVFormat.DEFAULT.withHeader());
 
-            if (!isValidUploadFile(parser.getHeaderMap() ) ) {
+            if (!isValidUploadFile(parser.getHeaderMap())) {
                 InstitutionsUploadResult result = new InstitutionsUploadResult();
                 result.setInstitutionUploadID(institutionsUpload.getId());
                 result.setOrganizationID(serviceProviderID);
 
                 result.setOutcome(InstitutionUploadResultsRepository.ERROR);
-                StringBuilder buf = new StringBuilder("The institutions CSV file must contain a header record with the following case sensitive column names: ");
+                StringBuilder buf = new StringBuilder(
+                    "The institutions CSV file must contain a header record with the following case sensitive "
+                        + "column names: ");
                 buf.append(String.join(",", REQUIRED_COLUMNS_NAMES));
                 result.setMessage(buf.toString());
                 this.create(result);
@@ -185,35 +189,42 @@ public class InstitutionUploadService {
                     Organization organization = new Organization();
                     organization.setName(record.get("name").trim());
 
-                    if (record.isMapped("street"))
+                    if (record.isMapped("street")) {
                         organization.setStreet(record.get("street").trim());
+                    }
 
                     organization.setCity(record.get("city").trim());
-                    organization.setState(record.get("state").trim());
-                    if (record.isMapped("zip"))
-                        organization.setZip(record.get("zip").trim());
 
-                    if (record.isMapped("website"))
+                    String state = record.get("state").trim();
+                    organization.setState(isBlank(state) ? null : state);
+
+                    if (record.isMapped("zip")) {
+                        organization.setZip(record.get("zip").trim());
+                    }
+
+                    if (record.isMapped("country")) {
+                        // Ensure ISO3166 code in upper case
+                        organization.setCountry(record.get("country").toUpperCase());
+                    }
+
+                    if (record.isMapped("website")) {
                         organization.setWebsite(record.get("website").trim());
+                    }
 
                     InstitutionsUploadResult result = new InstitutionsUploadResult();
                     result.setInstitutionUploadID(institutionsUpload.getId());
                     result.setOrganizationID(serviceProviderID);
-                    result.setLineNumber((int)parser.getCurrentLineNumber());
-
+                    result.setLineNumber((int) parser.getCurrentLineNumber());
 
                     Set<SchoolCode> schoolCodes = new HashSet<SchoolCode>();
 
                     try {
-                        addSchoolCode(schoolCodes, "ATP", record.get("atp").trim());
-                        addSchoolCode(schoolCodes, "FICE", record.get("fice").trim());
-                        addSchoolCode(schoolCodes, "IPEDS", record.get("ipeds").trim());
-                        addSchoolCode(schoolCodes, "OPEID", record.get("opeid").trim());
-                        addSchoolCode(schoolCodes, "ACT", record.get("act").trim());
-                        addSchoolCode(schoolCodes, "CDS", record.get("cds").trim());
-                        addSchoolCode(schoolCodes, "CEEB", record.get("ceeb").trim());
-                    }
-                    catch (IllegalArgumentException e) {
+                        Arrays.stream(SchoolCodeType.values()).forEach(value -> {
+                            String valueAsString = value.toString();
+                            addSchoolCode(schoolCodes, valueAsString,
+                                record.get(valueAsString.toLowerCase()).trim());
+                        });
+                    } catch (IllegalArgumentException e) {
                         result.setLineNumber((int) parser.getCurrentLineNumber());
 
                         result.setOutcome(InstitutionUploadResultsRepository.ERROR);
@@ -225,13 +236,14 @@ public class InstitutionUploadService {
                         continue;
                     }
 
-                    if (schoolCodes.isEmpty()){
+                    if (schoolCodes.isEmpty()) {
                         result.setLineNumber((int) parser.getCurrentLineNumber());
 
                         result.setOutcome(InstitutionUploadResultsRepository.ERROR);
 
-
-                        result.setMessage(String.format("No school code was provided for %s.  At least one school code must be used to create an institution", record.get("name")));
+                        result.setMessage(String.format(
+                            "No school code was provided for %s.  At least one school code must be used to create"
+                                + " an institution", record.get("name")));
 
                         this.create(result);
                         continue;
@@ -240,42 +252,56 @@ public class InstitutionUploadService {
                     List<Organization> institutions = organizationService.findBySchoolCodes(schoolCodes);
 
                     if (institutions.size() == 1) {
-                        organizationService.insecureLinkInstitutionWithServiceProvider(institutions.get(0).getId(), serviceProviderID);
+                        organizationService.insecureLinkInstitutionWithServiceProvider(institutions.get(0).getId(),
+                            serviceProviderID);
                         result.setOutcome(InstitutionUploadResultsRepository.SUCCESS);
                         result.setMessage(
-                                String.format("An institution was found with one or more of school code(s) ATP %s, FICE %s, IPEDS %s, ACT %s, OPEID %s, " +
-                                        "and was added to the service provider's serviceable institutions.", record.get("atp"), record.get("fice"), record.get("ipeds"), record.get("act"), record.get("opeid")));
+                            String.format(
+                                "An institution was found with one or more of school code(s) ATP %s, FICE %s,"
+                                    + " IPEDS %s, ACT %s, OPEID %s, GEOCODE %s,"
+                                    + " and was added to the service provider's serviceable institutions.",
+                                record.get("atp"), record.get("fice"), record.get("ipeds"), record.get("act"),
+                                record.get("opeid"), record.get("geocode")));
                         result.setInstitutionID(institutions.get(0).getId());
                         result.setInstitutionName(institutions.get(0).getName());
-                    }
-                    else if (institutions.isEmpty()) {
+                    } else if (institutions.isEmpty()) {
                         try {
-                            organization = organizationService.createInstitution(organization, schoolCodes, serviceProviderID);
-                            result.setMessage(String.format("An institution was created with the following school code(s) ATP %s, FICE %s, IPEDS %s, ACT %s, OPEID %s, " +
-                                    "and was added to the service provider's serviceable institutions.", record.get("atp"), record.get("fice"), record.get("ipeds"), record.get("act"), record.get("opeid")));
+                            organization = organizationService
+                                .createInstitution(organization, schoolCodes, serviceProviderID);
+                            result.setMessage(String.format(
+                                "An institution was created with the following school code(s) ATP %s, FICE %s,"
+                                    + " IPEDS %s, ACT %s, OPEID %s, GEOCODE %s,"
+                                    + " and was added to the service provider's serviceable institutions.",
+                                record.get("atp"), record.get("fice"), record.get("ipeds"), record.get("act"),
+                                record.get("opeid"), record.get("geocode")));
 
                             result.setOutcome(InstitutionUploadResultsRepository.SUCCESS);
                             result.setInstitutionID(organization.getId());
                             result.setInstitutionName(organization.getName());
-                        }
-                        catch (Exception e) {
+                        } catch (Exception e) {
                             log.error("Failed to create institution.", e);
                             result.setOutcome(InstitutionUploadResultsRepository.ERROR);
                             StringBuilder messageBuilder = new StringBuilder(String.format(
-                                    "<p>Could not create institution with code(s) ATP %s, FICE %s, IPEDS %s, ACT %s, OPEID %s.  Exception %s</p>",
-                                    record.get("atp"), record.get("fice"), record.get("ipeds"), record.get("act"), record.get("opeid"), e.getClass().getCanonicalName()));
+                                "<p>Could not create institution with code(s) ATP %s, FICE %s, IPEDS %s, ACT %s, "
+                                    + "OPEID %s, GEOCODE %s.  Exception %s</p>",
+                                record.get("atp"), record.get("fice"), record.get("ipeds"), record.get("act"),
+                                record.get("opeid"), record.get("geocode"), e.getClass().getCanonicalName()));
                             result.setMessage(messageBuilder.toString());
                             result.setInstitutionID(organization.getId());
                             result.setInstitutionName(organization.getName());
                         }
-                    }
-                    else {
+                    } else {
                         StringBuilder messageBuilder = new StringBuilder(String.format(
-                                "<div><p>%s was not processed because multiple institutions were found with the same school code(s) ATP %s, FICE %s, IPEDS %s, ACT %s, OPEID %s.  This indicates data inconsistency.</p>",
-                                record.get("name"), record.get("atp"), record.get("fice"), record.get("ipeds"), record.get("act"), record.get("opeid")));
+                            "<div><p>%s was not processed because multiple institutions were found with the same "
+                                + "school code(s) ATP %s, FICE %s, IPEDS %s, ACT %s, OPEID %s, GEOCODE %s.  This "
+                                + "indicates data inconsistency.</p>",
+                            record.get("name"), record.get("atp"), record.get("fice"), record.get("ipeds"),
+                            record.get("act"), record.get("opeid"), record.get("geocode")));
 
-                        for(Organization institution : institutions) {
-                            messageBuilder.append(String.format("<div><a href='#organization/%d'>%s</a></div>", institution.getId(), institution.getName()));
+                        for (Organization institution : institutions) {
+                            messageBuilder.append(String
+                                .format("<div><a href='#organization/%d'>%s</a></div>", institution.getId(),
+                                    institution.getName()));
                         }
 
                         messageBuilder.append("</div>");
@@ -289,8 +315,7 @@ public class InstitutionUploadService {
                     this.create(result);
 
                 }
-            }
-            catch (Exception e){
+            } catch (Exception e) {
 
                 log.error("Failed to process institution upload file. Inserting result record.", e);
 
@@ -305,19 +330,18 @@ public class InstitutionUploadService {
                     result.setMessage(e.getMessage());
                 }
                 this.create(result);
-            }
-            finally {
+            } finally {
                 parser.close();
                 reader.close();
 
             }
         } catch (Exception e) {
             log.error("Failed to process CSV file for institution creation.", e);
-        }
-        finally {
+        } finally {
             institutionsUpload.setEndTime(new Timestamp(Calendar.getInstance().getTimeInMillis()));
             this.update(institutionsUpload);
         }
 
     }
+
 }

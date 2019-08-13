@@ -16,36 +16,42 @@
 
 package org.pesc.api;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.cors.CrossOriginResourceSharing;
 import org.pesc.api.exception.ApiException;
-import org.pesc.api.model.ApiRequest;
-import org.pesc.api.model.ApiRequestParameter;
 import org.pesc.api.model.Endpoint;
+import org.pesc.api.model.Organization;
 import org.pesc.service.ApiRequestService;
 import org.pesc.service.EndpointService;
 import org.pesc.service.OrganizationService;
-import org.pesc.utils.TimeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.jws.WebService;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import javax.jws.WebService;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 /**
  * Created by James Whetstone (jwhetstone@ccctechcenter.org) on 3/22/16.
@@ -68,13 +74,15 @@ public class EndpointResource {
     @Autowired
     private ApiRequestService apiRequestService;
 
-
     //Security is enforced using method level annotations on the service.
     @Autowired
     private EndpointService endpointService;
 
     @Autowired
     private OrganizationService organizationService;
+    
+    @Autowired
+    private ServiceProviderResource serviceProviderResource;
 
 
     private void validateParameters(List<Integer> organizationIdList, String path) {
@@ -96,10 +104,8 @@ public class EndpointResource {
             @QueryParam("organizationId") @ApiParam(value = "A list of organization ID that use the endpoint.") List<Integer> organizationIdList,
             @QueryParam("mode") @ApiParam(value = "Must be either 'TEST' or 'LIVE'.") String mode,
             @QueryParam("enabled") @ApiParam(value = "'true' or 'false'") String enabled
-
     ) {
-
-
+        
         validateParameters(organizationIdList, baseURI + PATH);
 
         List<Endpoint> endpoints = endpointService.search(
@@ -112,6 +118,20 @@ public class EndpointResource {
                 mode,
                 enabled);
 
+        // If no endpoints are returned, check whether or not a service provider endpoint exists for this institution
+        if (organizationIdList.size() == 1 && (endpoints == null || endpoints.isEmpty())) {
+            // Examine whether the organization is served by a service provider, and attempt to find an endpoint this
+            // way
+            List<Organization> serviceProviders =
+                newArrayList(serviceProviderResource.getServiceProvidersForInstitution(organizationIdList.get(0)));
+            if (serviceProviders.size() > 1) {
+                throw new RuntimeException("More than one service provider specified for institution -> would "
+                    + "result in more than one endpoint being located.");
+            }
+            endpoints = endpointService.search(documentFormat, documentType, departmentName,
+                id, hostingOrganizationId, newArrayList(serviceProviders.get(0).getId()), mode, enabled);
+        }
+        
         apiRequestService.createAndSave(context.getHttpServletRequest().getParameterMap(), context.getHttpServletRequest().getRequestURI(), endpoints.size());
 
         return endpoints;

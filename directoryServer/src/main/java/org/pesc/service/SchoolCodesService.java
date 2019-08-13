@@ -114,6 +114,7 @@ public class SchoolCodesService {
     private Pattern eightDigitPattern = Pattern.compile("\\d{8}");
     private Pattern fourDigitPattern = Pattern.compile("\\d{4}");
     private Pattern fourteenDigitPattern = Pattern.compile("\\d{14}");
+    private Pattern twoLettersFiveDigitsPattern = Pattern.compile("[a-zA-Z]{2}\\d{5}");
 
     private boolean validate6Digits(String code)
     {
@@ -133,6 +134,10 @@ public class SchoolCodesService {
     private boolean validate4Digits(String code)
     {
         return fourDigitPattern.matcher(code).matches();
+    }
+    
+    private boolean validateGeocode(String code) {
+        return twoLettersFiveDigitsPattern.matcher(code).matches();
     }
 
     public void validateCode(String code, String codeType) throws IllegalArgumentException {
@@ -178,6 +183,12 @@ public class SchoolCodesService {
         else if (codeType.equalsIgnoreCase("EDEX")) {
             if (!org.apache.commons.lang3.StringUtils.isNumeric(code)){
                 throw new IllegalArgumentException(String.format("Bad EDEX code %s. EDEX codes must be numeric.", code));
+            }
+        }
+        else if (codeType.equalsIgnoreCase("GEOCODE")) {
+            if (!validateGeocode(code)) {
+                throw new IllegalArgumentException(String.format("Bad GEOCODE code %s. GEOCODE codes must be two "
+                        + "letters followed by five numerical digits.", code));
             }
         }
         else {
