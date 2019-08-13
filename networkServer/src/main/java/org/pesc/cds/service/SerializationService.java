@@ -26,7 +26,11 @@ import org.xml.sax.SAXException;
 
 import javax.annotation.Resource;
 import javax.naming.OperationNotSupportedException;
-import javax.xml.bind.*;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.PropertyException;
+import javax.xml.bind.Unmarshaller;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -85,9 +89,9 @@ public class SerializationService {
         unmarshaller.setProperty(UnmarshallerProperties.UNMARSHALLING_CASE_INSENSITIVE, Boolean.TRUE);
 
         Map<String, String> namespacePrefixMapper = new HashMap<String, String>(4);
-        namespacePrefixMapper.put("urn:org:pesc:core:CoreMain:v1.14.0", "core");
-        namespacePrefixMapper.put("urn:org:pesc:sector:AcademicRecord:v1.9.0", "AcRec");
-        namespacePrefixMapper.put("urn:org:pesc:message:CollegeTranscript:v1.6.0", "ColTrn");
+        namespacePrefixMapper.put("urn:org:pesc:core:CoreMain:v1.19.0", "core");
+        namespacePrefixMapper.put("urn:org:pesc:sector:AcademicRecord:v1.13.0", "AcRec");
+        namespacePrefixMapper.put("urn:org:pesc:message:CollegeTranscript:v1.8.0", "ColTrn");
         namespacePrefixMapper.put("http://www.xap.com/CCCTran", "CCC");
 
         unmarshaller.setProperty(UnmarshallerProperties.JSON_NAMESPACE_PREFIX_MAPPER, namespacePrefixMapper);
@@ -103,9 +107,9 @@ public class SerializationService {
         marshaller.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, Boolean.TRUE);
 
         Map<String, String> namespacePrefixMapper = new HashMap<String, String>(4);
-        namespacePrefixMapper.put("urn:org:pesc:core:CoreMain:v1.14.0", "core");
-        namespacePrefixMapper.put("urn:org:pesc:sector:AcademicRecord:v1.9.0", "AcRec");
-        namespacePrefixMapper.put("urn:org:pesc:message:CollegeTranscript:v1.6.0", "ColTrn");
+        namespacePrefixMapper.put("urn:org:pesc:core:CoreMain:v1.19.0", "core");
+        namespacePrefixMapper.put("urn:org:pesc:sector:AcademicRecord:v1.13.0", "AcRec");
+        namespacePrefixMapper.put("urn:org:pesc:message:CollegeTranscript:v1.8.0", "ColTrn");
         namespacePrefixMapper.put("http://www.xap.com/CCCTran", "CCC");
 
         marshaller.setProperty(MarshallerProperties.NAMESPACE_PREFIX_MAPPER, namespacePrefixMapper);
@@ -156,7 +160,7 @@ public class SerializationService {
     public Unmarshaller createTranscriptUnmarshaller(boolean validate, boolean useJSON) throws JAXBException, SAXException, OperationNotSupportedException {
         Unmarshaller unmarshaller =  unmarshaller(transcriptJAXBContext);
         if (validate == true) {
-            unmarshaller.setSchema(ValidationUtils.getSchema(XmlFileType.COLLEGE_TRANSCRIPT, XmlSchemaVersion.V1_6_0));
+            unmarshaller.setSchema(ValidationUtils.getSchema(XmlFileType.COLLEGE_TRANSCRIPT, XmlSchemaVersion.V1_8_0));
         }
         if (useJSON == true) {
             json(unmarshaller);

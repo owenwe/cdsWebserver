@@ -1,0 +1,196 @@
+<ns2:CollegeTranscript xmlns:ns2="urn:org:pesc:message:CollegeTranscript:v1.8.0" xmlns:ns3="urn:org:pesc:core:CoreMain:v1.19.0">
+    <TransmissionData>
+        <DocumentID>156</DocumentID>
+        <CreatedDateTime>2017-04-11T16:13:04.928Z</CreatedDateTime>
+        <DocumentTypeCode>StudentRequest</DocumentTypeCode>
+        <TransmissionType>Original</TransmissionType>
+        <Source>
+            <Organization>
+                <FICE>001334</FICE>
+                <OrganizationName>Ventura College</OrganizationName>
+                <Contacts/>
+            </Organization>
+        </Source>
+        <Destination>
+            <Organization>
+                <MutuallyDefined>7</MutuallyDefined>
+                <OrganizationName>Data by Touch</OrganizationName>
+                <Contacts>
+                    <Address>
+                        <AddressLine>4417 Vico Way</AddressLine>
+                        <City>Sacramento</City>
+                        <StateProvinceCode>CA</StateProvinceCode>
+                        <PostalCode>95864</PostalCode>
+                    </Address>
+                    <Phone>
+                        <AreaCityCode>916</AreaCityCode>
+                        <PhoneNumber>7610603</PhoneNumber>
+                    </Phone>
+                    <Email>
+                        <EmailAddress>jwhetstone@ccctechcenter.org</EmailAddress>
+                    </Email>
+                </Contacts>
+            </Organization>
+        </Destination>
+        <RequestTrackingID>156</RequestTrackingID>
+    </TransmissionData>
+    <Student>
+        <Person>
+            <SchoolAssignedPersonID>0</SchoolAssignedPersonID>
+            <SSN>000000000</SSN>
+            <PartialSSN>0000</PartialSSN>
+            <Birth>
+                <BirthDate>1995-01-01Z</BirthDate>
+            </Birth>
+            <Name>
+                <FirstName>John</FirstName>
+                <LastName>Doe</LastName>
+            </Name>
+            <HighSchool>
+                <OrganizationName>McClatchy High School</OrganizationName>
+                <CEEBACT>052705</CEEBACT>
+            </HighSchool>
+            <Contacts>
+                <Address>
+                    <AddressLine>2406 Capitol Ave. #4</AddressLine>
+                    <City>Sacramento</City>
+                    <StateProvinceCode>CA</StateProvinceCode>
+                    <PostalCode>95861</PostalCode>
+                </Address>
+                <Phone>
+                    <AreaCityCode>916</AreaCityCode>
+                    <PhoneNumber>3837016</PhoneNumber>
+                </Phone>
+                <Email>
+                    <EmailAddress>john.doe@ccctechcenter.org</EmailAddress>
+                </Email>
+            </Contacts>
+            <Gender>
+                <GenderCode>Male</GenderCode>
+            </Gender>
+            <Residency>
+                <StateProvinceCode>CA</StateProvinceCode>
+            </Residency>
+        </Person>
+        <AcademicRecord>
+            <School>
+                <OrganizationName>Butte College</OrganizationName>
+                <FICE>008073</FICE>
+            </School>
+            <StudentLevel>
+                <StudentLevelCode>CollegeSophomore</StudentLevelCode>
+            </StudentLevel>
+            <AcademicAward>
+                <AcademicAwardProgram>
+                    <ProgramCIPCode>11.0101</ProgramCIPCode>
+                    <AcademicProgramType>Major</AcademicProgramType>
+                    <AcademicProgramName>Computer and Information Sciences, General</AcademicProgramName>
+                    <ProgramSummary>
+                        <AcademicSummaryType>SenderOnly</AcademicSummaryType>
+                        <AcademicSummaryLevel>LowerDivision</AcademicSummaryLevel>
+                        <GPA>
+                            <CreditHoursAttempted>13</CreditHoursAttempted>
+                            <CreditHoursEarned>13</CreditHoursEarned>
+                            <CreditUnit>Semester</CreditUnit>
+                            <GradePointAverage>4.00</GradePointAverage>
+                            <TotalQualityPoints>52</TotalQualityPoints>
+                            <CreditHoursforGPA>47</CreditHoursforGPA>
+                        </GPA>
+                        <AcademicHonors>
+                            <HonorsTitle>Dean's List</HonorsTitle>
+                            <HonorsLevel>SecondHighest</HonorsLevel>
+                        </AcademicHonors>
+                    </ProgramSummary>
+                </AcademicAwardProgram>
+                <AcademicDegreeRequirement>
+                    <ThesisDissertationTitle>Sorting algorithm efficiency</ThesisDissertationTitle>
+                    <ThesisDissertationAdvisor>Dave Wilson</ThesisDissertationAdvisor>
+                </AcademicDegreeRequirement>
+                <AcademicSummary>
+                    <AcademicSummaryType>SenderOnly</AcademicSummaryType>
+                    <GPA>
+                        <CreditHoursAttempted>159</CreditHoursAttempted>
+                        <CreditHoursEarned>136</CreditHoursEarned>
+                        <CreditUnit>Semester</CreditUnit>
+                        <GradePointAverage>3.48</GradePointAverage>
+                        <TotalQualityPoints>473</TotalQualityPoints>
+                        <CreditHoursforGPA>153</CreditHoursforGPA>
+                    </GPA>
+                    <AcademicHonors>
+                        <HonorsTitle>Cum Laude</HonorsTitle>
+                        <HonorsLevel>ThirdHighest</HonorsLevel>
+                    </AcademicHonors>
+                </AcademicSummary>
+            </AcademicAward>
+            <AcademicSummary>
+                <AcademicSummaryType>SenderOnly</AcademicSummaryType>
+                <AcademicSummaryLevel>LowerDivision</AcademicSummaryLevel>
+                <GPA>
+                    <CreditHoursAttempted>159</CreditHoursAttempted>
+                    <CreditHoursEarned>136</CreditHoursEarned>
+                    <CreditUnit>Semester</CreditUnit>
+                    <GradePointAverage>3.48</GradePointAverage>
+                    <TotalQualityPoints>473</TotalQualityPoints>
+                    <CreditHoursforGPA>153</CreditHoursforGPA>
+                </GPA>
+                <AcademicHonors>
+                    <HonorsTitle>Suma Cum Laude</HonorsTitle>
+                    <HonorsLevel>FirstHighest</HonorsLevel>
+                </AcademicHonors>
+                <AcademicProgram>
+                    <ProgramCIPCode>123456</ProgramCIPCode>
+                    <AcademicProgramType>Major</AcademicProgramType>
+                    <AcademicProgramName>Computer Science</AcademicProgramName>
+                </AcademicProgram>
+            </AcademicSummary>
+            <AcademicSession>
+                <AcademicSessionDetail>
+                    <SessionDesignator>2015-10</SessionDesignator>
+                    <SessionName>Fall Semester 2015</SessionName>
+                    <SessionType>Semester</SessionType>
+                </AcademicSessionDetail>
+                <StudentLevel>
+                    <StudentLevelCode>CollegeFirstYear</StudentLevelCode>
+                </StudentLevel>
+                <AcademicProgram>
+                    <ProgramCIPCode>123456</ProgramCIPCode>
+                    <AcademicProgramType>Major</AcademicProgramType>
+                    <AcademicProgramName>Computer Science</AcademicProgramName>
+                    <ProgramSummary>
+                        <AcademicSummaryType>SenderOnly</AcademicSummaryType>
+                        <AcademicSummaryLevel>Undergraduate</AcademicSummaryLevel>
+                        <GPA>
+                            <CreditHoursAttempted>12</CreditHoursAttempted>
+                            <CreditHoursEarned>12</CreditHoursEarned>
+                            <CreditUnit>Semester</CreditUnit>
+                            <GradePointAverage>3.75</GradePointAverage>
+                            <TotalQualityPoints>45</TotalQualityPoints>
+                            <CreditHoursforGPA>12</CreditHoursforGPA>
+                        </GPA>
+                        <AcademicHonors>
+                            <HonorsTitle>Cum Laude</HonorsTitle>
+                            <HonorsLevel>ThirdHighest</HonorsLevel>
+                        </AcademicHonors>
+                    </ProgramSummary>
+                </AcademicProgram>
+                <Course>
+                    <CourseCreditBasis>Regular</CourseCreditBasis>
+                    <CourseCreditUnits>Semester</CourseCreditUnits>
+                    <CourseCreditValue>3</CourseCreditValue>
+                    <CourseCreditEarned>3</CourseCreditEarned>
+                    <CourseAcademicGradeScaleCode>25</CourseAcademicGradeScaleCode>
+                    <CourseAcademicGrade>A</CourseAcademicGrade>
+                    <CourseRepeatCode>RepeatNotCounted</CourseRepeatCode>
+                    <CourseQualityPointsEarned>12</CourseQualityPointsEarned>
+                    <CourseLevel>LowerDivision</CourseLevel>
+                    <CourseSubjectAbbreviation>CSC</CourseSubjectAbbreviation>
+                    <CourseNumber>15</CourseNumber>
+                    <OriginalCourseID>CSC 15</OriginalCourseID>
+                    <CourseTitle>Programming Concepts and Methodology I</CourseTitle>
+                    <CourseBeginDate>2014-09-01Z</CourseBeginDate>
+                    <CourseEndDate>2014-12-07Z</CourseEndDate>
+                </Course>
+            </AcademicSession>
+        </AcademicRecord>
+    </Student>
+</ns2:CollegeTranscript>

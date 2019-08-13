@@ -33,7 +33,7 @@ public class JaxbConfig {
 
     @Bean(name="transcriptJAXBContext")
     public JAXBContext transcriptJAXBContext() throws JAXBException {
-        return JAXBContextFactory.createContext("org.pesc.sdk.message.collegetranscript.v1_6.impl", null, null);
+        return JAXBContextFactory.createContext("org.pesc.sdk.message.collegetranscript.v1_8.impl", null, null);
     }
 
     @Bean(name="transcriptAcknowledgementJAXBContext")
@@ -65,10 +65,17 @@ public class JaxbConfig {
     public JAXBContext transcriptResponseJAXBContext() throws JAXBException {
         return  JAXBContextFactory.createContext("org.pesc.sdk.message.transcriptresponse.v1_4.impl", null, null);
     }
-
-
-    @Bean(name="transcriptRequestMarshaller")
-    public Jaxb2Marshaller transcriptRequestMarshaller(){
+    
+    @Bean(name = "collegeTranscriptMarshaller")
+    public Jaxb2Marshaller collegeTranscriptMarshaller() {
+        Jaxb2Marshaller collegeTranscriptMarshaller = new Jaxb2Marshaller();
+        collegeTranscriptMarshaller.setContextPath("org.pesc.sdk.message.collegetranscript.v1_8.impl");
+        collegeTranscriptMarshaller.setSchema(new ClassPathResource("xsd/pesc/CollegeTranscript_v1.8.0.xsd"));
+        return collegeTranscriptMarshaller;
+    }
+    
+    @Bean(name = "transcriptRequestMarshaller")
+    public Jaxb2Marshaller transcriptRequestMarshaller() {
         Jaxb2Marshaller transcriptRequestMarshaller = new Jaxb2Marshaller();
         transcriptRequestMarshaller.setContextPath("org.pesc.sdk.message.transcriptrequest.v1_4.impl");
         transcriptRequestMarshaller.setSchema(new ClassPathResource("xsd/pesc/TranscriptRequest_v1.4.0.xsd"));
@@ -82,7 +89,6 @@ public class JaxbConfig {
         documentInfoMarshaller.setSchema(new ClassPathResource("xsd/pesc/DocumentInfo_v1.0.0.xsd"));
         return documentInfoMarshaller;
     }
-
 
     @Bean(name="documentTransformMarshaller")
     public Jaxb2Marshaller documentTransformMarshaller(){

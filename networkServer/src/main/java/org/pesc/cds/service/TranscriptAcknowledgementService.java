@@ -19,13 +19,19 @@ package org.pesc.cds.service;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pesc.cds.exception.TranscriptException;
-import org.pesc.sdk.core.coremain.v1_14.DocumentTypeCodeType;
-import org.pesc.sdk.core.coremain.v1_14.GPAType;
-import org.pesc.sdk.core.coremain.v1_14.NameType;
-import org.pesc.sdk.core.coremain.v1_14.TransmissionTypeType;
-import org.pesc.sdk.message.collegetranscript.v1_6.CollegeTranscript;
+import org.pesc.sdk.core.coremain.v1_19.DocumentTypeCodeType;
+import org.pesc.sdk.core.coremain.v1_19.GPAType;
+import org.pesc.sdk.core.coremain.v1_19.NameType;
+import org.pesc.sdk.core.coremain.v1_19.TransmissionTypeType;
+import org.pesc.sdk.message.collegetranscript.v1_8.CollegeTranscript;
 import org.pesc.sdk.message.transcriptacknowledgement.v1_3.Acknowledgment;
-import org.pesc.sdk.sector.academicrecord.v1_9.*;
+import org.pesc.sdk.sector.academicrecord.v1_13.AcademicRecordType;
+import org.pesc.sdk.sector.academicrecord.v1_13.AcademicSessionType;
+import org.pesc.sdk.sector.academicrecord.v1_13.AcademicSummaryFType;
+import org.pesc.sdk.sector.academicrecord.v1_13.AcknowledgmentPersonType;
+import org.pesc.sdk.sector.academicrecord.v1_13.PersonType;
+import org.pesc.sdk.sector.academicrecord.v1_13.SourceDestinationType;
+import org.pesc.sdk.sector.academicrecord.v1_13.TransmissionDataType;
 import org.pesc.sdk.util.ValidationUtils;
 import org.pesc.sdk.util.XmlFileType;
 import org.pesc.sdk.util.XmlSchemaVersion;
@@ -33,19 +39,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.xml.sax.SAXException;
 
+import java.io.File;
+import java.io.StringWriter;
 import javax.naming.OperationNotSupportedException;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
-import java.io.File;
-import java.io.StringWriter;
-import java.util.Calendar;
-import java.util.List;
 
-/**
- * Created by James Whetstone on 1/5/17.
- */
 @Service
 public class TranscriptAcknowledgementService {
 
@@ -61,7 +62,7 @@ public class TranscriptAcknowledgementService {
     private static final Log log = LogFactory.getLog(TranscriptAcknowledgementService.class);
 
     private static final org.pesc.sdk.message.transcriptacknowledgement.v1_3.ObjectFactory transcriptAcknoweledgementFactory = new org.pesc.sdk.message.transcriptacknowledgement.v1_3.ObjectFactory();
-    private static final org.pesc.sdk.sector.academicrecord.v1_9.ObjectFactory academicRecordObjectFactory = new org.pesc.sdk.sector.academicrecord.v1_9.ObjectFactory();
+    private static final org.pesc.sdk.sector.academicrecord.v1_13.ObjectFactory academicRecordObjectFactory = new org.pesc.sdk.sector.academicrecord.v1_13.ObjectFactory();
 
     public Acknowledgment getTranscriptAcknowledgement(String filePath) throws JAXBException, SAXException, OperationNotSupportedException {
 
@@ -218,9 +219,9 @@ public class TranscriptAcknowledgementService {
     }
 
     public Acknowledgment buildBaseTranscriptAcknowledgement(SourceDestinationType source,
-                                                                        SourceDestinationType destination,
-                                                                        CollegeTranscript collegeTranscript,
-                                                                        String ackDocID,
+                                                             SourceDestinationType destination,
+                                                             CollegeTranscript collegeTranscript,
+                                                             String ackDocID,
                                                              String requestTrackingID) {
         Acknowledgment ack = transcriptAcknoweledgementFactory.createAcknowledgment();
 
@@ -232,15 +233,14 @@ public class TranscriptAcknowledgementService {
         transmissionData.setDocumentID(ackDocID);
         transmissionData.setDocumentTypeCode(DocumentTypeCodeType.ACKNOWLEDGMENT);
         transmissionData.setTransmissionType(TransmissionTypeType.ORIGINAL);
-        //Request tracking ID here is the transaction key as defined by the sender's network server.
+        //Request tracking ID here is the transaction id as defined by the sender's network server.
         transmissionData.setRequestTrackingID(requestTrackingID);
 
         ack.setTransmissionData(transmissionData);
 
         AcknowledgmentPersonType person = academicRecordObjectFactory.createAcknowledgmentPersonType();
         person.setName(collegeTranscript.getStudent().getPerson().getName());
-
-
+        
         ack.setAcademicSummary(findFirstAcademicSummary(collegeTranscript));
 
         AckTotals ackTotals = getCourseAndAwardTotals(collegeTranscript);

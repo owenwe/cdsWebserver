@@ -21,11 +21,8 @@ import org.junit.runner.RunWith;
 import org.pesc.cds.service.SerializationService;
 import org.pesc.cds.service.TranscriptAcknowledgementService;
 import org.pesc.cds.service.TranscriptService;
-import org.pesc.sdk.message.collegetranscript.v1_6.CollegeTranscript;
+import org.pesc.sdk.message.collegetranscript.v1_8.CollegeTranscript;
 import org.pesc.sdk.message.transcriptacknowledgement.v1_3.Acknowledgment;
-import org.pesc.sdk.util.ValidationUtils;
-import org.pesc.sdk.util.XmlFileType;
-import org.pesc.sdk.util.XmlSchemaVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,8 +35,6 @@ import org.xml.sax.SAXException;
 import javax.naming.OperationNotSupportedException;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.validation.Schema;
 import java.io.ByteArrayOutputStream;
 
 /**
@@ -67,9 +62,8 @@ public class TranscriptAcknowledgementTests {
     public void testVerification() throws JAXBException, SAXException, OperationNotSupportedException {
 
 
-        CollegeTranscript collegeTranscript = transcriptService.fromURL(getClass().getClassLoader().getResource("college-transcript.xml"), false);
-
-
+        CollegeTranscript collegeTranscript =
+            transcriptService.fromURL(getClass().getClassLoader().getResource("college-transcript-v1-8.xml"), false);
 
         Acknowledgment ack =
                 transcriptAcknowledgementService.buildBaseTranscriptAcknowledgement(collegeTranscript.getTransmissionData().getDestination(),

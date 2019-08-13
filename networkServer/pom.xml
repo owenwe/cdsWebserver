@@ -37,7 +37,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
-		<pesc.sdk.version>0.0.1-SNAPSHOT</pesc.sdk.version>
+		<pesc.sdk.version>0.0.2</pesc.sdk.version>
 		<docker.image.prefix>edex</docker.image.prefix>
 
 		<!-- OAuth2 -->
@@ -260,6 +260,5 @@
 		</plugins>
 
 	</build>
-	
 
 </project>
