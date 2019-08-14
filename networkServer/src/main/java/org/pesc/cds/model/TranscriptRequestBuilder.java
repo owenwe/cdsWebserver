@@ -373,8 +373,8 @@ public class TranscriptRequestBuilder {
          */
         SourceDestinationType source;
         if (sourceOrganizationCountry == null ||
-            sourceOrganizationCountry.equalsIgnoreCase("US") ||
-            sourceOrganizationCountry.equalsIgnoreCase("CA")) {
+            sourceOrganizationCountry.equalsIgnoreCase(CountryAlpha2CodeSimpleType.US.value()) ||
+            sourceOrganizationCountry.equalsIgnoreCase(CountryAlpha2CodeSimpleType.CA.value())) {
             source =
                 createDomesticSourceDestinationType(
                     sourceOrganizationNames,

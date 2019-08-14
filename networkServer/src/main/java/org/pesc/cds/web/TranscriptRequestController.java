@@ -31,6 +31,7 @@ import org.pesc.cds.repository.TransactionService;
 import org.pesc.cds.service.OrganizationService;
 import org.pesc.cds.service.PKIService;
 import org.pesc.cds.utils.ErrorUtils;
+import org.pesc.sdk.codes.iso_3166_1.v1_0.CountryAlpha2CodeSimpleType;
 import org.pesc.sdk.core.coremain.v1_19.DocumentTypeCodeType;
 import org.pesc.sdk.core.coremain.v1_19.StateProvinceCodeType;
 import org.pesc.sdk.core.coremain.v1_19.TransmissionTypeType;
@@ -129,7 +130,8 @@ public class TranscriptRequestController {
         String city = edexOrganization.getString("city");
         String country = edexOrganization.optString("country", null);
         StateProvinceCodeType stateProvinceCode = null;
-        if (country == null || country.equalsIgnoreCase("US") || country.equalsIgnoreCase("CA")) {
+        if (country == null || country.equalsIgnoreCase(CountryAlpha2CodeSimpleType.US.value()) ||
+            country.equalsIgnoreCase(CountryAlpha2CodeSimpleType.CA.value())) {
             stateProvinceCode = StateProvinceCodeType.valueOf(edexOrganization.getString("state"));
         }
         String postalCode = edexOrganization.optString("zip", null);
@@ -243,7 +245,8 @@ public class TranscriptRequestController {
         String city = edexOrganization.getString("city");
         String country = edexOrganization.optString("country", null);
         StateProvinceCodeType stateProvinceCode = null;
-        if (country == null || country.equalsIgnoreCase("US") || country.equalsIgnoreCase("CA")) {
+        if (country == null || country.equalsIgnoreCase(CountryAlpha2CodeSimpleType.US.value()) ||
+            country.equalsIgnoreCase(CountryAlpha2CodeSimpleType.CA.value())) {
             stateProvinceCode = StateProvinceCodeType.valueOf(edexOrganization.getString("state"));
         }
         String postalCode = edexOrganization.optString("zip", null);
