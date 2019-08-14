@@ -36,7 +36,7 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class PescAddressUtils {
-    private static final Logger log = LoggerFactory.getLogger(PescAddressUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(PescAddressUtils.class);
 
     private static final Map<String, String> iso3Toiso2CountryCodeMap;
 
@@ -175,7 +175,7 @@ public class PescAddressUtils {
 
         countryStr = StringUtils.strip(countryStr, " \"");
         if (countryStr==null || isEmpty(countryStr)) {
-            log.debug("null country string: " + countryStr);
+            logger.debug("null country string: " + countryStr);
             // use US as the default country
             return CountryAlpha2CodeSimpleType.US;
         }
@@ -199,7 +199,7 @@ public class PescAddressUtils {
         } else if (iso2CountryCodes.contains(countryStr)) {
             countryCode = CountryAlpha2CodeSimpleType.valueOf(countryStr);
         } else {
-            log.warn("Invalid country string: " + countryStr);
+            logger.warn("Invalid country string: " + countryStr);
             countryCode = null;
         }
 
@@ -231,7 +231,7 @@ public class PescAddressUtils {
             try {
                 stateProvinceCode = StateProvinceCodeType.valueOf(stateStr);
             } catch (Exception e) {
-                log.warn("Exception thrown in parsing state string: " + stateStr, e);
+                logger.warn("Exception thrown in parsing state string: " + stateStr, e);
             }
         } else {
             stateStr = toCamelCase(stateStr);
@@ -239,7 +239,7 @@ public class PescAddressUtils {
                 try {
                     stateProvinceCode = StateProvinceCodeType.valueOf(stateMap.get(stateStr));
                 } catch (Exception e) {
-                    log.warn("Exception thrown in parsing state string: " + stateStr, e);
+                    logger.warn("Exception thrown in parsing state string: " + stateStr, e);
                 }
             }
         }

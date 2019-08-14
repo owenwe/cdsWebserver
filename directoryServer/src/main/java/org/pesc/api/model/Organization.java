@@ -182,7 +182,7 @@ public class Organization implements Serializable {
         return country;
     }
     
-    public void setCountry(String countryCode) {
+    public void setCountry(String country) {
         this.country = country;
     }
     

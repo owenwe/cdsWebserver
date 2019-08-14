@@ -17,6 +17,7 @@
 package org.pesc.cds.model;
 
 import static org.apache.commons.lang3.StringUtils.SPACE;
+import static org.apache.commons.lang3.StringUtils.rightPad;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -79,8 +80,6 @@ public class TranscriptRequestBuilder {
     private static final org.pesc.sdk.message.functionalacknowledgement.v1_2.ObjectFactory
         functionalacknowledgementObjectFactory =
         new org.pesc.sdk.message.functionalacknowledgement.v1_2.ObjectFactory();
-
-    private static final String TWO_SPACES = "  ";
 
     private Marshaller documentInfoMarshaller;
 
@@ -184,13 +183,9 @@ public class TranscriptRequestBuilder {
     
     private String xsdSafeOrganizationCity(String organizationCity) {
         if (organizationCity == null) {
-            organizationCity = TWO_SPACES;
+            organizationCity = "";
         }
-        // XSD Definition says City is a minimum of 2 characters: 1 character towns do exist, so add a space to pass
-        if (organizationCity.length() == 1) {
-            organizationCity += SPACE;
-        }
-        return organizationCity;
+        return rightPad(organizationCity, 2);
     }
     
     public TranscriptRequestBuilder sourceOrganizationStateProvinceCode(StateProvinceCodeType sourceOrganizationStateProvinceCode) {
