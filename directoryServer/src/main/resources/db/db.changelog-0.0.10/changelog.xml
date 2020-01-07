@@ -4,7 +4,7 @@
   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
 
   <changeSet id="organizationTableDropNotNullConstraintFromOrganizationStateColumn" author="Andrew John Connell" context="dev, ci, prod">
-    <dropNotNullConstraint tableName="organization" columnName="state"/>
+    <dropNotNullConstraint tableName="organization" columnName="state" columnDataType="VARCHAR(20)"/>
   </changeSet>
 
   <changeSet id="organizationTableIntroduceCountryField" author="Andrew John Connell" context="dev, ci, prod">
