@@ -174,8 +174,8 @@ public class PescAddressUtils {
         CountryAlpha2CodeSimpleType countryCode = null;
 
         countryStr = StringUtils.strip(countryStr, " \"");
-        if (countryStr==null || isEmpty(countryStr)) {
-            logger.debug("null country string: " + countryStr);
+        if (StringUtils.isBlank(countryStr)) {
+            logger.debug("Invalid country string: " + countryStr);
             // use US as the default country
             return CountryAlpha2CodeSimpleType.US;
         }
@@ -219,7 +219,7 @@ public class PescAddressUtils {
         if (!(countryCode.equals(CountryAlpha2CodeSimpleType.CA) || countryCode.equals(CountryAlpha2CodeSimpleType.US))) return null;
 
         stateStr = StringUtils.strip(stateStr, " \"");
-        if (stateStr==null || isEmpty(stateStr)) {
+        if (StringUtils.isBlank(stateStr)) {
             return null;
         }
 

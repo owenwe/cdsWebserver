@@ -169,7 +169,7 @@ public class TranscriptRequestBuilder {
     }
     
     private List<String> xsdSafeOrganizationAddressLines(List<String> organizationAddressLines) {
-        if (organizationAddressLines == null || organizationAddressLines.isEmpty()) {
+        if (CollectionUtils.isEmpty(organizationAddressLines)) {
             organizationAddressLines = Lists.newArrayList(SPACE);
         }
         return organizationAddressLines;
@@ -367,7 +367,7 @@ public class TranscriptRequestBuilder {
                   </Source>
          */
         SourceDestinationType source;
-        if (sourceOrganizationCountry == null ||
+        if (StringUtils.isBlank(sourceOrganizationCountry) ||
             sourceOrganizationCountry.equalsIgnoreCase(CountryAlpha2CodeSimpleType.US.value()) ||
             sourceOrganizationCountry.equalsIgnoreCase(CountryAlpha2CodeSimpleType.CA.value())) {
             source =

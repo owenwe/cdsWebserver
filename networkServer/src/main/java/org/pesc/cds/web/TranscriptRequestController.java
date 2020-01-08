@@ -130,7 +130,7 @@ public class TranscriptRequestController {
         String city = edexOrganization.getString("city");
         String country = edexOrganization.optString("country", null);
         StateProvinceCodeType stateProvinceCode = null;
-        if (country == null || country.equalsIgnoreCase(CountryAlpha2CodeSimpleType.US.value()) ||
+        if (StringUtils.isBlank(country) || country.equalsIgnoreCase(CountryAlpha2CodeSimpleType.US.value()) ||
             country.equalsIgnoreCase(CountryAlpha2CodeSimpleType.CA.value())) {
             stateProvinceCode = StateProvinceCodeType.valueOf(edexOrganization.getString("state"));
         }
@@ -245,7 +245,7 @@ public class TranscriptRequestController {
         String city = edexOrganization.getString("city");
         String country = edexOrganization.optString("country", null);
         StateProvinceCodeType stateProvinceCode = null;
-        if (country == null || country.equalsIgnoreCase(CountryAlpha2CodeSimpleType.US.value()) ||
+        if (StringUtils.isBlank(country) || country.equalsIgnoreCase(CountryAlpha2CodeSimpleType.US.value()) ||
             country.equalsIgnoreCase(CountryAlpha2CodeSimpleType.CA.value())) {
             stateProvinceCode = StateProvinceCodeType.valueOf(edexOrganization.getString("state"));
         }

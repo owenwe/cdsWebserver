@@ -35,6 +35,7 @@ import org.pesc.service.OrganizationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -119,7 +120,7 @@ public class EndpointResource {
                 enabled);
 
         // If no endpoints are returned, check whether or not a service provider endpoint exists for this institution
-        if (organizationIdList.size() == 1 && (endpoints == null || endpoints.isEmpty())) {
+        if (organizationIdList.size() == 1 && CollectionUtils.isEmpty(endpoints)) {
             // Examine whether the organization is served by a service provider, and attempt to find an endpoint this
             // way
             List<Organization> serviceProviders =
