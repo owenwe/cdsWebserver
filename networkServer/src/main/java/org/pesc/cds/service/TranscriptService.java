@@ -20,23 +20,17 @@ package org.pesc.cds.service;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.pesc.sdk.message.collegetranscript.v1_6.CollegeTranscript;
-import org.pesc.sdk.util.ValidationUtils;
-import org.pesc.sdk.util.XmlFileType;
-import org.pesc.sdk.util.XmlSchemaVersion;
+import org.pesc.sdk.message.collegetranscript.v1_8.CollegeTranscript;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.xml.sax.SAXException;
 
 import javax.naming.OperationNotSupportedException;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.validation.Schema;
 import java.io.StringWriter;
 import java.net.URL;
-
 
 @Service
 public class TranscriptService {

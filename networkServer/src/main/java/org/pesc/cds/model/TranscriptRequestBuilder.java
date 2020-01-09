@@ -16,17 +16,20 @@
 
 package org.pesc.cds.model;
 
+import static org.apache.commons.lang3.StringUtils.SPACE;
+import static org.apache.commons.lang3.StringUtils.rightPad;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
-import org.pesc.sdk.core.coremain.v1_14.BirthType;
-import org.pesc.sdk.core.coremain.v1_14.CountryCodeType;
-import org.pesc.sdk.core.coremain.v1_14.DocumentTypeCodeType;
-import org.pesc.sdk.core.coremain.v1_14.NameType;
-import org.pesc.sdk.core.coremain.v1_14.StateProvinceCodeType;
-import org.pesc.sdk.core.coremain.v1_14.TransmissionTypeType;
-import org.pesc.sdk.core.coremain.v1_14.UserDefinedExtensionsType;
-import org.pesc.sdk.core.coremain.v1_14.SeverityCodeType;
+import org.pesc.sdk.codes.iso_3166_1.v1_0.CountryAlpha2CodeSimpleType;
+import org.pesc.sdk.core.coremain.v1_19.BirthType;
+import org.pesc.sdk.core.coremain.v1_19.DocumentTypeCodeType;
+import org.pesc.sdk.core.coremain.v1_19.NameType;
+import org.pesc.sdk.core.coremain.v1_19.SeverityCodeType;
+import org.pesc.sdk.core.coremain.v1_19.StateProvinceCodeType;
+import org.pesc.sdk.core.coremain.v1_19.TransmissionTypeType;
+import org.pesc.sdk.core.coremain.v1_19.UserDefinedExtensionsType;
 import org.pesc.sdk.message.documentinfo.v1_0.DocumentInfo;
 import org.pesc.sdk.message.documentinfo.v1_0.DocumentInfoType;
 import org.pesc.sdk.message.documentinfo.v1_0.DocumentTypeCode;
@@ -34,19 +37,19 @@ import org.pesc.sdk.message.functionalacknowledgement.v1_2.SyntaxErrorType;
 import org.pesc.sdk.message.functionalacknowledgement.v1_2.ValidationResponse;
 import org.pesc.sdk.message.transcriptrequest.v1_4.TranscriptRequest;
 import org.pesc.sdk.message.transcriptrequest.v1_4.TranscriptRequestValidator;
-import org.pesc.sdk.sector.academicrecord.v1_9.AddressType;
-import org.pesc.sdk.sector.academicrecord.v1_9.AttendanceType;
-import org.pesc.sdk.sector.academicrecord.v1_9.ContactsType;
-import org.pesc.sdk.sector.academicrecord.v1_9.EmailType;
-import org.pesc.sdk.sector.academicrecord.v1_9.OrganizationType;
-import org.pesc.sdk.sector.academicrecord.v1_9.PersonType;
-import org.pesc.sdk.sector.academicrecord.v1_9.PhoneType;
-import org.pesc.sdk.sector.academicrecord.v1_9.ReleaseAuthorizedMethodType;
-import org.pesc.sdk.sector.academicrecord.v1_9.RequestType;
-import org.pesc.sdk.sector.academicrecord.v1_9.RequestedStudentType;
-import org.pesc.sdk.sector.academicrecord.v1_9.SchoolType;
-import org.pesc.sdk.sector.academicrecord.v1_9.SourceDestinationType;
-import org.pesc.sdk.sector.academicrecord.v1_9.TransmissionDataType;
+import org.pesc.sdk.sector.academicrecord.v1_13.AddressType;
+import org.pesc.sdk.sector.academicrecord.v1_13.AttendanceType;
+import org.pesc.sdk.sector.academicrecord.v1_13.ContactsType;
+import org.pesc.sdk.sector.academicrecord.v1_13.EmailType;
+import org.pesc.sdk.sector.academicrecord.v1_13.OrganizationType;
+import org.pesc.sdk.sector.academicrecord.v1_13.PersonType;
+import org.pesc.sdk.sector.academicrecord.v1_13.PhoneType;
+import org.pesc.sdk.sector.academicrecord.v1_13.ReleaseAuthorizedMethodType;
+import org.pesc.sdk.sector.academicrecord.v1_13.RequestType;
+import org.pesc.sdk.sector.academicrecord.v1_13.RequestedStudentType;
+import org.pesc.sdk.sector.academicrecord.v1_13.SchoolType;
+import org.pesc.sdk.sector.academicrecord.v1_13.SourceDestinationType;
+import org.pesc.sdk.sector.academicrecord.v1_13.TransmissionDataType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.oxm.Marshaller;
@@ -64,12 +67,20 @@ import java.util.Map;
  * Created by sallen on 8/1/16.
  */
 public class TranscriptRequestBuilder {
+    
     private static final Log log = LogFactory.getLog(TranscriptRequestBuilder.class);
-    private static final org.pesc.sdk.message.transcriptrequest.v1_4.ObjectFactory transcriptrequestObjectFactory = new org.pesc.sdk.message.transcriptrequest.v1_4.ObjectFactory();
-    private static final org.pesc.sdk.sector.academicrecord.v1_9.ObjectFactory academicRecordObjectFactory = new org.pesc.sdk.sector.academicrecord.v1_9.ObjectFactory();
-    private static final org.pesc.sdk.core.coremain.v1_14.ObjectFactory coreMainObjectFactory = new org.pesc.sdk.core.coremain.v1_14.ObjectFactory();
-    private static final org.pesc.sdk.message.documentinfo.v1_0.ObjectFactory DocumentInfoObjectFactory = new org.pesc.sdk.message.documentinfo.v1_0.ObjectFactory();
-    private static final org.pesc.sdk.message.functionalacknowledgement.v1_2.ObjectFactory functionalacknowledgementObjectFactory = new org.pesc.sdk.message.functionalacknowledgement.v1_2.ObjectFactory();
+    private static final org.pesc.sdk.message.transcriptrequest.v1_4.ObjectFactory
+        transcriptrequestObjectFactory = new org.pesc.sdk.message.transcriptrequest.v1_4.ObjectFactory();
+    private static final org.pesc.sdk.sector.academicrecord.v1_13.ObjectFactory
+        academicRecordObjectFactory = new org.pesc.sdk.sector.academicrecord.v1_13.ObjectFactory();
+    private static final org.pesc.sdk.core.coremain.v1_19.ObjectFactory coreMainObjectFactory =
+        new org.pesc.sdk.core.coremain.v1_19.ObjectFactory();
+    private static final org.pesc.sdk.message.documentinfo.v1_0.ObjectFactory DocumentInfoObjectFactory =
+        new org.pesc.sdk.message.documentinfo.v1_0.ObjectFactory();
+    private static final org.pesc.sdk.message.functionalacknowledgement.v1_2.ObjectFactory
+        functionalacknowledgementObjectFactory =
+        new org.pesc.sdk.message.functionalacknowledgement.v1_2.ObjectFactory();
+
     private Marshaller documentInfoMarshaller;
 
     private String documentID;
@@ -83,7 +94,8 @@ public class TranscriptRequestBuilder {
     private String sourceOrganizationCity;
     private StateProvinceCodeType sourceOrganizationStateProvinceCode;
     private String sourceOrganizationPostalCode;
-      //optional
+    private String sourceOrganizationCountry;
+    // optional
     private PhoneType sendersPhone;
     private String sendersEmail;
     //destination
@@ -94,6 +106,7 @@ public class TranscriptRequestBuilder {
     private String destinationCity;
     private StateProvinceCodeType destinationOrganizationStateProvinceCode;
     private String destinationOrganizationPostalCode;
+    private String destinationOrganizationCountry;
     private PhoneType receiversPhone;
     private String receiversEmail;
     //document
@@ -150,25 +163,49 @@ public class TranscriptRequestBuilder {
     }
 
     public TranscriptRequestBuilder sourceOrganizationAddressLines(List<String> sourceOrganizationAddressLines) {
+        sourceOrganizationAddressLines = xsdSafeOrganizationAddressLines(sourceOrganizationAddressLines);
         this.sourceOrganizationAddressLines = sourceOrganizationAddressLines;
         return this;
     }
-
+    
+    private List<String> xsdSafeOrganizationAddressLines(List<String> organizationAddressLines) {
+        if (CollectionUtils.isEmpty(organizationAddressLines)) {
+            organizationAddressLines = Lists.newArrayList(SPACE);
+        }
+        return organizationAddressLines;
+    }
+    
     public TranscriptRequestBuilder sourceOrganizationCity(String sourceOrganizationCity) {
+        sourceOrganizationCity = xsdSafeOrganizationCity(sourceOrganizationCity);
         this.sourceOrganizationCity = sourceOrganizationCity;
         return this;
     }
-
+    
+    private String xsdSafeOrganizationCity(String organizationCity) {
+        if (organizationCity == null) {
+            organizationCity = "";
+        }
+        return rightPad(organizationCity, 2);
+    }
+    
     public TranscriptRequestBuilder sourceOrganizationStateProvinceCode(StateProvinceCodeType sourceOrganizationStateProvinceCode) {
         this.sourceOrganizationStateProvinceCode = sourceOrganizationStateProvinceCode;
         return this;
     }
 
     public TranscriptRequestBuilder sourceOrganizationPostalCode(String sourceOrganizationPostalCode) {
+        if (sourceOrganizationPostalCode == null) {
+            sourceOrganizationPostalCode = SPACE;
+        }
         this.sourceOrganizationPostalCode = sourceOrganizationPostalCode;
         return this;
     }
-
+    
+    public TranscriptRequestBuilder sourceOrganizationCountry(String sourceOrganizationCountry) {
+        this.sourceOrganizationCountry = sourceOrganizationCountry;
+        return this;
+    }
+    
     public TranscriptRequestBuilder sendersPhone(PhoneType sendersPhone) {
         this.sendersPhone = sendersPhone;
         return this;
@@ -208,7 +245,12 @@ public class TranscriptRequestBuilder {
         this.destinationOrganizationPostalCode = destinationOrganizationPostalCode;
         return this;
     }
-
+    
+    public TranscriptRequestBuilder destinationOrganizationCountry(String destinationOrganizationCountry) {
+        this.destinationOrganizationCountry = destinationOrganizationCountry;
+        return this;
+    }
+    
     public TranscriptRequestBuilder receiversPhone(PhoneType receiversPhone) {
         this.receiversPhone = receiversPhone;
         return this;
@@ -263,7 +305,6 @@ public class TranscriptRequestBuilder {
         this.studentSchoolName = studentSchoolName;
         return this;
     }
-
 
     public TranscriptRequestBuilder studentSchoolCodes(Map<SchoolCodeType, String> studentSchoolCodes) {
         this.studentSchoolCodes = studentSchoolCodes;
@@ -325,7 +366,29 @@ public class TranscriptRequestBuilder {
                      </Organization>
                   </Source>
          */
-        SourceDestinationType source = createDomesticSourceDestinationType(sourceOrganizationNames, sourceOrganizationAddressLines, sourceOrganizationCity, sourceOrganizationStateProvinceCode, sourceOrganizationPostalCode, sourceSchoolCodes, sendersPhone, sendersEmail);
+        SourceDestinationType source;
+        if (StringUtils.isBlank(sourceOrganizationCountry) ||
+            sourceOrganizationCountry.equalsIgnoreCase(CountryAlpha2CodeSimpleType.US.value()) ||
+            sourceOrganizationCountry.equalsIgnoreCase(CountryAlpha2CodeSimpleType.CA.value())) {
+            source =
+                createDomesticSourceDestinationType(
+                    sourceOrganizationNames,
+                    sourceOrganizationAddressLines,
+                    sourceOrganizationCity,
+                    sourceOrganizationStateProvinceCode,
+                    sourceOrganizationPostalCode,
+                    sourceSchoolCodes,
+                    sendersPhone,
+                    sendersEmail);
+        } else {
+            source = createInternationalSourceDestinationType(sourceOrganizationNames,
+                sourceOrganizationAddressLines,
+                sourceOrganizationCity,
+                CountryAlpha2CodeSimpleType.valueOf(sourceOrganizationCountry),
+                sourceSchoolCodes,
+                sendersPhone,
+                sendersEmail);
+        }
         transmissionData.setSource(source);
         /**
                   <Destination>
@@ -402,10 +465,10 @@ public class TranscriptRequestBuilder {
         requestedStudent.setReleaseAuthorizedMethod(studentReleasedMethod);
         PersonType person = academicRecordObjectFactory.createPersonType();
         requestedStudent.setPerson(person);
-        if(StringUtils.isNotBlank(studentPartialSsn)) {
+        if (StringUtils.isNotBlank(studentPartialSsn)) {
             person.setPartialSSN(studentPartialSsn);
         }
-        if(studentBirthDate!=null) {
+        if (studentBirthDate != null) {
             BirthType birth = coreMainObjectFactory.createBirthType();
             person.setBirth(birth);
             birth.setBirthDate(studentBirthDate);
@@ -415,7 +478,7 @@ public class TranscriptRequestBuilder {
         name.setFirstName(studentFirstName);
         name.getMiddleNames().addAll(studentMiddleNames);
         name.setLastName(studentLastName);
-        if(studentEmail!=null) {
+        if (studentEmail != null) {
             ContactsType contact = academicRecordObjectFactory.createContactsType();
             person.getContacts().add(contact);
             EmailType email = academicRecordObjectFactory.createEmailType();
@@ -432,14 +495,14 @@ public class TranscriptRequestBuilder {
         ValidationResponse validationResponse = TranscriptRequestValidator.validateTranscriptRequestRequiredContent(transcriptRequest);
         if (validationResponse.getSeverity() == SeverityCodeType.FATAL_ERROR || validationResponse.getSeverity() == SeverityCodeType.ERROR) {
             SyntaxErrorType error = functionalacknowledgementObjectFactory.createSyntaxErrorType();
-            error.setErrorMessage("Required content missing for documentId: "+documentID);
+            error.setErrorMessage("Required content missing for documentId: " + documentID);
             error.setSeverityCode(SeverityCodeType.ERROR);
             validationResponse.addErrorToTop(error);//put on top
             log.error(validationResponse.toString());
             throw new IllegalStateException(validationResponse.toString());
-        } else if(validationResponse.getErrors().size()>0){
+        } else if (validationResponse.getErrors().size() > 0) {
             SyntaxErrorType warning = functionalacknowledgementObjectFactory.createSyntaxErrorType();
-            warning.setErrorMessage("Recommended content missing for documentId: "+documentID);
+            warning.setErrorMessage("Recommended content missing for documentId: " + documentID);
             warning.setSeverityCode(SeverityCodeType.WARNING);
             validationResponse.addErrorToTop(warning);//put on top
             log.warn(validationResponse.toString());
@@ -500,7 +563,7 @@ public class TranscriptRequestBuilder {
      * @param email - optional
      * @return
      */
-    private SourceDestinationType createInternationalSourceDestinationType(List<String> organizationNames, List<String> organizationAddressLines, String organizationCity, CountryCodeType organizationCountryCode, Map<SchoolCodeType, String> schoolCodes, PhoneType phone, String email){
+    private SourceDestinationType createInternationalSourceDestinationType(List<String> organizationNames, List<String> organizationAddressLines, String organizationCity, CountryAlpha2CodeSimpleType organizationCountryCode, Map<SchoolCodeType, String> schoolCodes, PhoneType phone, String email){
         return createInternationalSourceDestinationType(organizationNames, organizationAddressLines, organizationCity, null, null, organizationCountryCode, schoolCodes, phone, email);
     }
 
@@ -517,7 +580,7 @@ public class TranscriptRequestBuilder {
      * @param email - optional
      * @return
      */
-    private SourceDestinationType createInternationalSourceDestinationType(List<String> organizationNames, List<String> organizationAddressLines, String organizationCity, String organizationStateProvince, String organizationPostalCode, CountryCodeType organizationCountryCode, Map<SchoolCodeType, String> schoolCodes, PhoneType phone, String email){
+    private SourceDestinationType createInternationalSourceDestinationType(List<String> organizationNames, List<String> organizationAddressLines, String organizationCity, String organizationStateProvince, String organizationPostalCode, CountryAlpha2CodeSimpleType organizationCountryCode, Map<SchoolCodeType, String> schoolCodes, PhoneType phone, String email){
         return createSourceDestinationType(organizationNames, organizationAddressLines, organizationCity, null, organizationStateProvince, organizationPostalCode, organizationCountryCode, schoolCodes, phone, email);
     }
 
@@ -525,16 +588,25 @@ public class TranscriptRequestBuilder {
      * Don't use this method directly, use convenience methods above
      * @return
      */
-    private SourceDestinationType createSourceDestinationType(List<String> organizationNames, List<String> organizationAddressLines, String organizationCity, StateProvinceCodeType organizationStateProvinceCode, String organizationStateProvince, String organizationPostalCode, CountryCodeType organizationCountryCode, Map<SchoolCodeType, String> schoolCodes, PhoneType phone, String email){
-        org.pesc.sdk.sector.academicrecord.v1_9.ObjectFactory academicRecordObjectFactory = new org.pesc.sdk.sector.academicrecord.v1_9.ObjectFactory();
-        SourceDestinationType sourceDestination = academicRecordObjectFactory.createSourceDestinationType();
+    private SourceDestinationType createSourceDestinationType(List<String> organizationNames,
+                                                              List<String> organizationAddressLines,
+                                                              String organizationCity,
+                                                              StateProvinceCodeType organizationStateProvinceCode,
+                                                              String organizationStateProvince,
+                                                              String organizationPostalCode,
+                                                              CountryAlpha2CodeSimpleType organizationCountryCode,
+                                                              Map<SchoolCodeType, String> schoolCodes,
+                                                              PhoneType phone,
+                                                              String email) {
+        SourceDestinationType sourceDestination =
+            academicRecordObjectFactory.createSourceDestinationType();
         OrganizationType organization = academicRecordObjectFactory.createOrganizationType();
         sourceDestination.setOrganization(organization);
         setSchoolCode(schoolCodes, organization);
         organization.getOrganizationNames().addAll(organizationNames);
         ContactsType contact = academicRecordObjectFactory.createContactsType();
         organization.getContacts().add(contact);
-        if(!CollectionUtils.isEmpty(organizationAddressLines)) {
+        if (!CollectionUtils.isEmpty(organizationAddressLines)) {
             AddressType address = academicRecordObjectFactory.createAddressType();
             contact.getAddresses().add(address);
             address.getAddressLines().addAll(organizationAddressLines);
@@ -550,7 +622,7 @@ public class TranscriptRequestBuilder {
         if(phone!=null && StringUtils.isNotBlank(phone.getPhoneNumber())){
             contact.getPhones().add(phone);
         }
-        if(StringUtils.isNotBlank(email)){
+        if (StringUtils.isNotBlank(email)) {
             EmailType emailType = academicRecordObjectFactory.createEmailType();
             contact.getEmails().add(emailType);
             emailType.setEmailAddress(email);
@@ -584,9 +656,9 @@ public class TranscriptRequestBuilder {
          */
         return sourceDestination;
     }
-
-    private void setSchoolCode(Map<SchoolCodeType, String> schoolCodes, OrganizationType organizationType){
-        for(SchoolCodeType schoolCodeType: SchoolCodeType.values()) {
+    
+    private void setSchoolCode(Map<SchoolCodeType, String> schoolCodes, OrganizationType organizationType) {
+        for (SchoolCodeType schoolCodeType : SchoolCodeType.values()) {
             switch (schoolCodeType) {
                 case ACT:
                     organizationType.setACT(schoolCodes.get(schoolCodeType));
@@ -606,6 +678,9 @@ public class TranscriptRequestBuilder {
                 case CEEB:
                     organizationType.setCEEBACT(schoolCodes.get(schoolCodeType));
                     break;
+                case GEOCODE:
+                    organizationType.setGEOCode(schoolCodes.get(schoolCodeType));
+                    break;
                 case EDEXCHANGE:
                     organizationType.setMutuallyDefined(schoolCodes.get(schoolCodeType));
                     break;
@@ -614,9 +689,9 @@ public class TranscriptRequestBuilder {
             }
         }
     }
-
-    private void setSchoolCode(Map<SchoolCodeType, String> schoolCodes, SchoolType school){
-        for(SchoolCodeType schoolCodeType: SchoolCodeType.values()) {
+    
+    private void setSchoolCode(Map<SchoolCodeType, String> schoolCodes, SchoolType school) {
+        for (SchoolCodeType schoolCodeType : SchoolCodeType.values()) {
             switch (schoolCodeType) {
                 case ACT:
                     school.setACT(schoolCodes.get(schoolCodeType));
@@ -635,6 +710,9 @@ public class TranscriptRequestBuilder {
                     break;
                 case CEEB:
                     school.setCEEBACT(schoolCodes.get(schoolCodeType));
+                    break;
+                case GEOCODE:
+                    school.setGEOCode(schoolCodes.get(schoolCodeType));
                     break;
                 case EDEXCHANGE:
                     school.setMutuallyDefined(schoolCodes.get(schoolCodeType));

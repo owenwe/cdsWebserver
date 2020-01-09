@@ -22,13 +22,13 @@ import org.junit.runner.RunWith;
 import org.pesc.cds.domain.Transaction;
 import org.pesc.cds.service.FileProcessorService;
 import org.pesc.cds.service.SerializationService;
-import org.pesc.sdk.message.collegetranscript.v1_6.CollegeTranscript;
+import org.pesc.sdk.message.collegetranscript.v1_8.CollegeTranscript;
 import org.pesc.sdk.message.functionalacknowledgement.v1_2.Acknowledgment;
 import org.pesc.sdk.message.transcriptrequest.v1_4.TranscriptRequest;
 import org.pesc.sdk.message.transcriptresponse.v1_4.TranscriptResponse;
-import org.pesc.sdk.sector.academicrecord.v1_9.HoldReasonType;
-import org.pesc.sdk.sector.academicrecord.v1_9.ResponseHoldType;
-import org.pesc.sdk.sector.academicrecord.v1_9.ResponseStatusType;
+import org.pesc.sdk.sector.academicrecord.v1_13.HoldReasonType;
+import org.pesc.sdk.sector.academicrecord.v1_13.ResponseHoldType;
+import org.pesc.sdk.sector.academicrecord.v1_13.ResponseStatusType;
 import org.pesc.sdk.util.ValidationUtils;
 import org.pesc.sdk.util.XmlFileType;
 import org.pesc.sdk.util.XmlSchemaVersion;
@@ -45,14 +45,11 @@ import javax.naming.OperationNotSupportedException;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.validation.Schema;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Calendar;
-
-import static junit.framework.TestCase.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = NetworkServerApplication.class, webEnvironment= SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -60,7 +57,7 @@ import static junit.framework.TestCase.assertTrue;
 @ActiveProfiles("test")
 public class DocumentTests {
 
-    public static Logger logger = LoggerFactory.getLogger(DocumentTests.class);
+    private static Logger logger = LoggerFactory.getLogger(DocumentTests.class);
 
     @Autowired
     FileProcessorService fileProcessorService;
@@ -141,7 +138,7 @@ public class DocumentTests {
 
         Unmarshaller unmarshaller =  serializationService.createTranscriptUnmarshaller(false, false);
 
-        Object object = unmarshaller.unmarshal(getClass().getClassLoader().getResourceAsStream("college-transcript.xml"));
+        Object object = unmarshaller.unmarshal(getClass().getClassLoader().getResourceAsStream("college-transcript-v1-8.xml"));
 
         Marshaller marshaller = serializationService.createTranscriptMarshaller(true);
 
@@ -159,7 +156,7 @@ public class DocumentTests {
 
         Assert.assertTrue("Failed to unmarshall JSON transcript from PESC College Transcript object.", object instanceof CollegeTranscript);
 
-        CollegeTranscript collegeTranscript = (CollegeTranscript)object;
+        CollegeTranscript collegeTranscript = (CollegeTranscript) object;
 
         Assert.assertTrue("Student's first name is incorrect.", collegeTranscript.getStudent().getPerson().getName().getFirstName().equals("John"));
 

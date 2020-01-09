@@ -16,7 +16,7 @@
 
 package org.pesc.sdk.util;
 
-import org.pesc.sdk.core.coremain.v1_14.SeverityCodeType;
+import org.pesc.sdk.core.coremain.v1_19.SeverityCodeType;
 import org.pesc.sdk.message.functionalacknowledgement.v1_2.SyntaxErrorType;
 import org.pesc.sdk.message.functionalacknowledgement.v1_2.ValidationResponse;
 import org.xml.sax.SAXException;
@@ -63,7 +63,7 @@ public class ValidationUtils {
         }
     }
 
-    public static Schema getSchema( XmlFileType fileType, XmlSchemaVersion version) throws OperationNotSupportedException, SAXException {
+    public static Schema getSchema(XmlFileType fileType, XmlSchemaVersion version) throws OperationNotSupportedException, SAXException {
 
         String xsdResourceName = new StringBuilder("/xsd/pesc/")
                 .append(fileType.getFilenamePrefix())

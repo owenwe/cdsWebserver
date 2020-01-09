@@ -21,11 +21,14 @@ package org.pesc.sdk.util;
  */
 public enum XmlSchemaVersion {
     V1_0_0("v1.0.0"),
-    V1_5_0("v1.5.0"),
-    V1_6_0("v1.6.0"),
+    V1_1_0("v1.1.0"),
     V1_2_0("v1.2.0"),
     V1_3_0("v1.3.0"),
-    V1_4_0("v1.4.0");
+    V1_4_0("v1.4.0"),
+    V1_5_0("v1.5.0"),
+    V1_6_0("v1.6.0"),
+    V1_7_0("v1.7.0"),
+    V1_8_0("v1.8.0");
 
     private final String versionText;
 

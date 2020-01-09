@@ -37,8 +37,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
-import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.List;
 
@@ -47,10 +45,12 @@ import java.util.List;
  */
 @Service
 public class OrganizationService {
+    
     private static final Log log = LogFactory.getLog(OrganizationService.class);
     private static final String ORGANIZATION = CacheConfig.PREFIX + "Organization";
     private static final String ORGANIZATIONS = CacheConfig.PREFIX + "Organizations";
-
+    private static final String INSTITUTION = "INSTITUTION";
+    
     @Value("${directory.server.base.url}")
     private String directoryServer;
 
@@ -111,16 +111,14 @@ public class OrganizationService {
     }
 
     public boolean isInstitution(JSONObject organization){
-        boolean institution = false;
         JSONArray organizationTypes = organization.getJSONArray("organizationTypes");
-        for(int i=0; i<organizationTypes.length(); i++){
+        for (int i = 0; i < organizationTypes.length(); i++) {
             String organizationType = organizationTypes.getJSONObject(i).getString("name");
-            if("Institution".equals(organizationType)){
-                institution = true;
-                break;
+            if (INSTITUTION.equalsIgnoreCase(organizationType)) {
+                return true;
             }
         }
-        return institution;
+        return false;
     }
 
     public String getEndpointForOrg(Integer orgID, String documentFormat, String documentType, String department, EndpointMode mode) {
@@ -137,7 +135,6 @@ public class OrganizationService {
 
         if (StringUtils.isNotBlank(department))
             uri.append("&department=").append(department);
-
 
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));

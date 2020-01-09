@@ -31,13 +31,14 @@ import org.pesc.cds.repository.TransactionService;
 import org.pesc.cds.service.OrganizationService;
 import org.pesc.cds.service.PKIService;
 import org.pesc.cds.utils.ErrorUtils;
-import org.pesc.sdk.core.coremain.v1_14.DocumentTypeCodeType;
-import org.pesc.sdk.core.coremain.v1_14.StateProvinceCodeType;
-import org.pesc.sdk.core.coremain.v1_14.TransmissionTypeType;
+import org.pesc.sdk.codes.iso_3166_1.v1_0.CountryAlpha2CodeSimpleType;
+import org.pesc.sdk.core.coremain.v1_19.DocumentTypeCodeType;
+import org.pesc.sdk.core.coremain.v1_19.StateProvinceCodeType;
+import org.pesc.sdk.core.coremain.v1_19.TransmissionTypeType;
 import org.pesc.sdk.message.documentinfo.v1_0.DocumentTypeCode;
 import org.pesc.sdk.message.transcriptrequest.v1_4.TranscriptRequest;
-import org.pesc.sdk.sector.academicrecord.v1_9.PhoneType;
-import org.pesc.sdk.sector.academicrecord.v1_9.ReleaseAuthorizedMethodType;
+import org.pesc.sdk.sector.academicrecord.v1_13.PhoneType;
+import org.pesc.sdk.sector.academicrecord.v1_13.ReleaseAuthorizedMethodType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -67,7 +68,7 @@ import java.util.*;
  * Created by james on 9/12/16.
  */
 @RestController
-@RequestMapping(value="api/v1/transcript-requests")
+@RequestMapping(value = "api/v1/transcript-requests")
 @Api(tags = "Transcript Requests", description = "Manage transcript requests.")
 public class TranscriptRequestController {
 
@@ -76,10 +77,10 @@ public class TranscriptRequestController {
     @Autowired
     private PKIService pkiService;
 
-    @Resource(name="transcriptRequestMarshaller")
+    @Resource(name = "transcriptRequestMarshaller")
     private Marshaller transcriptRequestMarshaller;
 
-    @Resource(name="documentInfoMarshaller")
+    @Resource(name = "documentInfoMarshaller")
     private Marshaller documentInfoMarshaller;
 
     @Value("${networkServer.outbox.path}")
@@ -104,13 +105,14 @@ public class TranscriptRequestController {
 
     private String getEmailAddress(JSONObject edexOrganization) {
         JSONArray contacts = edexOrganization.getJSONArray("contacts");
-        if(contacts.length()>0){
+        if (contacts.length() > 0) {
             JSONObject contact = contacts.getJSONObject(0);
             return contact.getString("email");
         }
 
         return null;
     }
+
     /**
      * The source school indicates the school that is requesting the transcript.
      * @param builder
@@ -123,48 +125,55 @@ public class TranscriptRequestController {
         SchoolCodeType srcSchoolCodeType = SchoolCodeType.valueOf(schoolDTO.getSchoolCodeType());
         schoolCodes.put(srcSchoolCodeType, schoolDTO.getSchoolCode());
 
-
         List<String> organizationNames = Arrays.asList(edexOrganization.getString("name"));
-        List<String> addresses = Arrays.asList(edexOrganization.getString("street"));
+        List<String> addresses = Arrays.asList(edexOrganization.optString("street", StringUtils.SPACE));
         String city = edexOrganization.getString("city");
-        StateProvinceCodeType stateProvinceCode = StateProvinceCodeType.valueOf(edexOrganization.getString("state"));
-        String postalCode = edexOrganization.getString("zip");
-        org.pesc.sdk.sector.academicrecord.v1_9.ObjectFactory academicRecordObjectFactory = new org.pesc.sdk.sector.academicrecord.v1_9.ObjectFactory();
+        String country = edexOrganization.optString("country", null);
+        StateProvinceCodeType stateProvinceCode = null;
+        if (StringUtils.isBlank(country) || country.equalsIgnoreCase(CountryAlpha2CodeSimpleType.US.value()) ||
+            country.equalsIgnoreCase(CountryAlpha2CodeSimpleType.CA.value())) {
+            stateProvinceCode = StateProvinceCodeType.valueOf(edexOrganization.getString("state"));
+        }
+        String postalCode = edexOrganization.optString("zip", null);
+        org.pesc.sdk.sector.academicrecord.v1_13.ObjectFactory academicRecordObjectFactory = new org.pesc.sdk.sector.academicrecord.v1_13.ObjectFactory();
         PhoneType phone = createPhone(edexOrganization.optString("telephone", ""));
 
         builder.sourceSchoolCodes(schoolCodes)
-                .sendersEmail(getEmailAddress(edexOrganization))
-                .sendersPhone(phone)
-                .sourceOrganizationNames(organizationNames)
-                .sourceOrganizationAddressLines(addresses)
-                .sourceOrganizationCity(city)
-                .sourceOrganizationStateProvinceCode(stateProvinceCode)
-                .sourceOrganizationPostalCode(postalCode);
-
+               .sendersEmail(getEmailAddress(edexOrganization))
+               .sendersPhone(phone)
+               .sourceOrganizationNames(organizationNames)
+               .sourceOrganizationAddressLines(addresses)
+               .sourceOrganizationCity(city)
+               .sourceOrganizationStateProvinceCode(stateProvinceCode)
+               .sourceOrganizationPostalCode(postalCode)
+               .sourceOrganizationCountry(country);
 
     }
 
 
-    private PhoneType createPhone(String phoneNumber){
-        org.pesc.sdk.sector.academicrecord.v1_9.ObjectFactory academicRecordObjectFactory = new org.pesc.sdk.sector.academicrecord.v1_9.ObjectFactory();
+    private PhoneType createPhone(String phoneNumber) {
+        org.pesc.sdk.sector.academicrecord.v1_13.ObjectFactory academicRecordObjectFactory =
+            new org.pesc.sdk.sector.academicrecord.v1_13.ObjectFactory();
         PhoneType phone = academicRecordObjectFactory.createPhoneType();//Provided by Source Institution - optional
-        if(StringUtils.isNotBlank(phoneNumber)) {
+        if (StringUtils.isNotBlank(phoneNumber)) {
             int extensionIndex = StringUtils.indexOfIgnoreCase(phoneNumber, "x");//has extension?
-            if(extensionIndex!=-1) {
-                if((phoneNumber.length()-1)>extensionIndex) {
+            if (extensionIndex != -1) {
+                if ((phoneNumber.length() - 1) > extensionIndex) {
                     String extension = phoneNumber.substring(extensionIndex + 1);
                     phone.setPhoneNumberExtension(extension);
                 }
                 phoneNumber = phoneNumber.substring(0, extensionIndex - 1);
             }
             phoneNumber = phoneNumber.replaceAll("\\D", "");
-            if(phoneNumber.length()>7){
-                String basePhoneNumber = phoneNumber.substring(phoneNumber.length()-7);
+            if (phoneNumber.length() > 7) {
+                String basePhoneNumber = phoneNumber.substring(phoneNumber.length() - 7);
                 phone.setPhoneNumber(basePhoneNumber);
-                String areaCode = phoneNumber.length()>10?phoneNumber.substring(phoneNumber.length()-10, phoneNumber.length()-7):phoneNumber.substring(0, phoneNumber.length()-7);
+                String areaCode = phoneNumber.length() > 10 ? phoneNumber
+                    .substring(phoneNumber.length() - 10, phoneNumber.length() - 7)
+                    : phoneNumber.substring(0, phoneNumber.length() - 7);
                 phone.setAreaCityCode(areaCode);
-                if(phoneNumber.length()>10){
-                    String countryCode = phoneNumber.substring(0, phoneNumber.length()-10);
+                if (phoneNumber.length() > 10) {
+                    String countryCode = phoneNumber.substring(0, phoneNumber.length() - 10);
                     phone.setCountryPrefixCode(countryCode);
                 }
             }
@@ -180,7 +189,7 @@ public class TranscriptRequestController {
         String trStudentReleasedMethod = transcriptRequestDTO.getStudentReleasedMethod();
         String studentBirthDate = transcriptRequestDTO.getStudentBirthDate();
         String trStudentFirstName = transcriptRequestDTO.getStudentFirstName();
-        String trStudentLastName = transcriptRequestDTO.getStudentLastName() ;
+        String trStudentLastName = transcriptRequestDTO.getStudentLastName();
         String trStudentMiddleName = transcriptRequestDTO.getStudentMiddleName();
         String trStudentEmail = transcriptRequestDTO.getStudentEmail();
         String trStudentPartialSsn = transcriptRequestDTO.getStudentPartialSSN();
@@ -231,12 +240,16 @@ public class TranscriptRequestController {
         SchoolCodeType srcSchoolCodeType = SchoolCodeType.valueOf(schoolDTO.getSchoolCodeType());
         schoolCodes.put(srcSchoolCodeType, schoolDTO.getSchoolCode());
 
-
         List<String> organizationNames = Arrays.asList(edexOrganization.getString("name"));
-        List<String> addresses = Arrays.asList(edexOrganization.getString("street"));
+        List<String> addresses = Arrays.asList(edexOrganization.optString("street", StringUtils.SPACE));
         String city = edexOrganization.getString("city");
-        StateProvinceCodeType stateProvinceCode = StateProvinceCodeType.valueOf(edexOrganization.getString("state"));
-        String postalCode = edexOrganization.getString("zip");
+        String country = edexOrganization.optString("country", null);
+        StateProvinceCodeType stateProvinceCode = null;
+        if (StringUtils.isBlank(country) || country.equalsIgnoreCase(CountryAlpha2CodeSimpleType.US.value()) ||
+            country.equalsIgnoreCase(CountryAlpha2CodeSimpleType.CA.value())) {
+            stateProvinceCode = StateProvinceCodeType.valueOf(edexOrganization.getString("state"));
+        }
+        String postalCode = edexOrganization.optString("zip", null);
         PhoneType phone = createPhone(edexOrganization.optString("telephone", ""));
 
         builder.destinationSchoolCodes(schoolCodes)
@@ -267,10 +280,10 @@ public class TranscriptRequestController {
     public List<Transaction> transcriptRequest( @RequestBody TranscriptRequestDTO transcriptRequestDTO
     ) {
 
-        Preconditions.checkArgument(transcriptRequestDTO.getDestinationInstitutions().size() == 1) ;
+        Preconditions.checkArgument(transcriptRequestDTO.getDestinationInstitutions().size() == 1);
         Preconditions.checkArgument(transcriptRequestDTO.getSourceInstitutions().size() == 1);
 
-        String fileFormat = DocumentFormat.PESCXML.getFormatName();
+        String fileFormat = transcriptRequestDTO.getFileFormat();
         String documentType = DocumentType.TRANSCRIPT_REQUEST.getDocumentName();
         String department = "Administration";
 
@@ -287,9 +300,10 @@ public class TranscriptRequestController {
 
         Transaction tx = new Transaction();
 
-        //Get the endpoint for the record holder.  This is where the transcript request will be sent.
+        //Get the endpoint for the record holder (or their authorised service provider).  This is where the transcript
+        // request will be sent.
         String endpointURI = organizationService.getEndpointURIForSchool(recordHolderInstitution.getSchoolCode(), recordHolderInstitution.getSchoolCodeType(), fileFormat,
-                    documentType, department, tx, transcriptRequestRecordHolderNames, transcriptRequestDTO.getMode());
+            documentType, department, tx, transcriptRequestRecordHolderNames, transcriptRequestDTO.getMode());
 
 
         if (endpointURI == null) {
@@ -308,9 +322,8 @@ public class TranscriptRequestController {
         outboxDirectory.mkdirs();
         UUID uuid = UUID.randomUUID();
         String ext = "xml";
-        String trFileName = uuid.toString()+"_document."+ext;
+        String trFileName = uuid.toString() + "_document." + ext;
         File requestFile = new File(outboxDirectory, trFileName);
-
 
         tx.setSenderId(requestorOrg.getInt("id"));
         tx.setRecipientId(recordHolderOrg.getInt("id"));
@@ -328,7 +341,6 @@ public class TranscriptRequestController {
         DocumentTypeCodeType trDocumentTypeCode = DocumentTypeCodeType.STUDENT_REQUEST;
         TransmissionTypeType trTransmissionType = TransmissionTypeType.ORIGINAL;
         String trRequestTrackingID = tx.getId() + "";
-
 
         //destination
 
@@ -348,25 +360,23 @@ public class TranscriptRequestController {
                 .parchmentDocumentTypeCode(trDocumentType)
                 .fileName(trFileName);
 
-
-        constructStudent(builder,transcriptRequestDTO, recordHolderInstitution,recordHolderOrg);
+        constructStudent(builder, transcriptRequestDTO, recordHolderInstitution, recordHolderOrg);
 
         constructTranscriptRequestDestination(builder, recordHolderInstitution, recordHolderOrg);
 
-        constructTranscriptRequestSource(builder,transcriptRequestor, requestorOrg);
+        constructTranscriptRequestSource(builder, transcriptRequestor, requestorOrg);
 
         TranscriptRequest transcriptRequest = builder.build();
 
         try {
-            if(!requestFile.createNewFile()){
-                String message = tx.getError()!=null?tx.getError():"";
+            if (!requestFile.createNewFile()) {
+                String message = tx.getError() != null ? tx.getError() : "";
                 tx.setError(message + ". " + String.format("file %s already exists", trFileName));
-            }else {
+            } else {
                 //File gets saved to file system here.
                 transcriptRequestMarshaller.marshal(transcriptRequest, new StreamResult(requestFile));
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             log.error("Failed to save transcript request document.", e);
 
             tx.setError(e.getLocalizedMessage());
@@ -381,7 +391,7 @@ public class TranscriptRequestController {
 
         try {
             if (StringUtils.isEmpty(tx.getError())) {
-                sendDocument(requestFile, endpointURI, tx, fileFormat,documentType, department);
+                sendDocument(requestFile, endpointURI, tx, fileFormat, documentType, department);
             }
         } catch (Exception e) {
 
@@ -394,9 +404,6 @@ public class TranscriptRequestController {
         }
 
         //Now send the transcript request document to the destination school
-
-
-
 
         return transactions;
     }
@@ -424,10 +431,8 @@ public class TranscriptRequestController {
                 }
             });
 
-
             org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
             headers.setContentType(org.springframework.http.MediaType.MULTIPART_FORM_DATA);
-
 
             ResponseEntity<String> response = restTemplate.exchange
                     (endpointURI, HttpMethod.POST, new org.springframework.http.HttpEntity<Object>(map, headers), String.class);

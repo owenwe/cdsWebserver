@@ -40,13 +40,13 @@ import org.pesc.cds.service.OrganizationService;
 import org.pesc.cds.service.PKIService;
 import org.pesc.cds.utils.DocumentUtils;
 import org.pesc.cds.utils.ErrorUtils;
-import org.pesc.sdk.core.coremain.v1_14.DocumentTypeCodeType;
-import org.pesc.sdk.core.coremain.v1_14.StateProvinceCodeType;
-import org.pesc.sdk.core.coremain.v1_14.TransmissionTypeType;
+import org.pesc.sdk.core.coremain.v1_19.DocumentTypeCodeType;
+import org.pesc.sdk.core.coremain.v1_19.StateProvinceCodeType;
+import org.pesc.sdk.core.coremain.v1_19.TransmissionTypeType;
 import org.pesc.sdk.message.documentinfo.v1_0.DocumentTypeCode;
 import org.pesc.sdk.message.transcriptrequest.v1_4.TranscriptRequest;
-import org.pesc.sdk.sector.academicrecord.v1_9.PhoneType;
-import org.pesc.sdk.sector.academicrecord.v1_9.ReleaseAuthorizedMethodType;
+import org.pesc.sdk.sector.academicrecord.v1_13.PhoneType;
+import org.pesc.sdk.sector.academicrecord.v1_13.ReleaseAuthorizedMethodType;
 import org.pesc.sdk.util.ValidationUtils;
 import org.pesc.sdk.util.XmlFileType;
 import org.pesc.sdk.util.XmlSchemaVersion;
@@ -419,7 +419,8 @@ public class DocumentController {
                 boolean createTranscriptRequest = !"PESCXML".equals(fileFormat);
                 if (createTranscriptRequest) {
                     String requestFileName = uuid.toString() + "_request.xml";
-                    org.pesc.sdk.sector.academicrecord.v1_9.ObjectFactory academicRecordObjectFactory = new org.pesc.sdk.sector.academicrecord.v1_9.ObjectFactory();
+                    org.pesc.sdk.sector.academicrecord.v1_13.ObjectFactory academicRecordObjectFactory =
+                        new org.pesc.sdk.sector.academicrecord.v1_13.ObjectFactory();
                     String trDocumentID = tx.getId() + "";
                     DocumentTypeCodeType trDocumentTypeCode = DocumentTypeCodeType.STUDENT_REQUEST;
                     TransmissionTypeType trTransmissionType = TransmissionTypeType.ORIGINAL;
@@ -642,6 +643,7 @@ public class DocumentController {
             @RequestParam(value = "document_type", required = false) String documentType,
             @RequestParam(value = "department", required = false) String department,
             @RequestParam(value = "transaction_id", required = false) Integer transactionId,
+            @RequestParam(value = "originating_transaction_id", required = false) Integer originatingTransactionId,
             @RequestParam(value = "ack_url", required = false) String ackURL,
             @RequestParam(value = "transcript_request_file", required = false) MultipartFile transcriptRequestFile,
             HttpServletRequest request
@@ -650,7 +652,9 @@ public class DocumentController {
         log.info(request.getRequestURI().toString());
 
         log.debug(String.format("received file from network server " + recipientId));
-
+        if (originatingTransactionId != null) {
+            log.debug("Originating transaction id: " + originatingTransactionId);
+        }
 
         if (multipartFile == null || signatureFile == null) {
             log.error("Incorrect number of file uploaded.  Is the digital signature file present?");

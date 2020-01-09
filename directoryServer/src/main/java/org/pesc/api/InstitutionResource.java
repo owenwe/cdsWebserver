@@ -138,7 +138,8 @@ public class InstitutionResource {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @ApiOperation("Accepts a CSV file where each row represents and institution that should be associated with the service " +
             "provider.  If the institution already exists in the system, the service provider is granted permissions to " +
-            "handle endpoints for the institution. The file header and the columns for the data are state,name,city,ipeds,fice,act,atp,opeid")
+            "handle endpoints for the institution. The file header and the columns for the data are name,city,state,"
+            + "country,act,atp,cds,ceeb,fice,geocode,ipeds,opeid")
     public InstitutionsUpload associateInstitutions(@Multipart("org_id") @ApiParam("The service provider's directory ID.") Integer providerID,
                                       @Multipart("file") @ApiParam("The csv file.") Attachment attachment) {
 

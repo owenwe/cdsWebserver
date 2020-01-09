@@ -18,7 +18,7 @@ package org.pesc.sdk.message.functionalacknowledgement.v1_2;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.pesc.sdk.core.coremain.v1_14.SeverityCodeType;
+import org.pesc.sdk.core.coremain.v1_19.SeverityCodeType;
 
 import java.util.List;
 

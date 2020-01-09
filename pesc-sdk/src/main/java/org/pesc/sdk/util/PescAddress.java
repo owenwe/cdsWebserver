@@ -16,7 +16,7 @@
 
 package org.pesc.sdk.util;
 
-import org.pesc.sdk.sector.academicrecord.v1_9.AddressType;
+import org.pesc.sdk.core.coremain.v1_19.AddressType;
 
 /**
  * Created with IntelliJ IDEA.

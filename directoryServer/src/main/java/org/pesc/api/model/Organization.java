@@ -37,12 +37,13 @@ import java.util.Set;
 @JsonPropertyOrder({"name", "website", "street", "city", "state", "zip", "organizationTypes", "schoolCodes"})
 @ApiModel
 public class Organization implements Serializable {
-
+    
+    private static final long serialVersionUID = -7253981892654766778L;
+    
     @Column(name = "name")
     @ApiModelProperty(position = 1, required = true, value = "The free form name of the organization.")
     private String name;
-
-
+    
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -66,6 +67,9 @@ public class Organization implements Serializable {
 
     @Column(name = "state")
     private String state;
+    
+    @Column(name = "country")
+    private String country;
 
     @Column(name = "zip")
     private String zip;
@@ -173,7 +177,15 @@ public class Organization implements Serializable {
     public void setState(String state) {
         this.state = state;
     }
-
+    
+    public String getCountry() {
+        return country;
+    }
+    
+    public void setCountry(String country) {
+        this.country = country;
+    }
+    
     public String getZip() {
         return zip;
     }
